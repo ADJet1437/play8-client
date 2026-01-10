@@ -1,4 +1,3 @@
-import { Logo } from './Logo';
 import { FiInstagram, FiFacebook, FiTwitter } from 'react-icons/fi';
 
 export function Footer() {
@@ -7,15 +6,8 @@ export function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-gray-200 py-12">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <Logo className="mb-4" />
-            <p className="text-gray-600 max-w-xs">
-              Providing premium tennis ball machine services for players of all levels.
-            </p>
-          </div>
-          
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+          <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
@@ -30,9 +22,9 @@ export function Footer() {
             </ul>
           </div>
           
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Connect With Us</h3>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 justify-center md:justify-start">
               <a href="#" className="text-gray-600 hover:text-indigo-600">
                 <FiInstagram size={20} />
               </a>
