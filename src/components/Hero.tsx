@@ -15,11 +15,11 @@ export function Hero() {
               Perfect your technique, improve your reflexes, and take your game to the next level.
             </p>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/booking">
+              <a href="#booking" className="inline-block">
                 <Button variant="primary" size="lg">
                   Book a Machine
                 </Button>
-              </Link>
+              </a>
               <Link to="/about">
                 <Button variant="outline" size="lg">
                   Learn More

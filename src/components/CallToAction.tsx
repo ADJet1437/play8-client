@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
 export function CallToAction() {
@@ -12,7 +11,7 @@ export function CallToAction() {
           Book a tennis ball machine now and take your skills to the next level.
           Our machines are available at convenient locations and times.
         </p>
-        <Link to="/booking">
+        <a href="#booking">
           <Button 
             variant="secondary" 
             size="lg"
@@ -20,7 +19,7 @@ export function CallToAction() {
           >
             Book a Machine Now
           </Button>
-        </Link>
+        </a>
       </div>
     </section>
   );

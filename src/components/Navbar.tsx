@@ -30,12 +30,23 @@ export function Navbar() {
           <Link to="/" className="text-gray-700 hover:text-indigo-600 font-medium">
             Home
           </Link>
-          <Link to="/booking" className="text-gray-700 hover:text-indigo-600 font-medium">
+          <a 
+            href="/#booking" 
+            className="text-gray-700 hover:text-indigo-600 font-medium"
+          >
             Booking
-          </Link>
+          </a>
           <Link to="/about" className="text-gray-700 hover:text-indigo-600 font-medium">
             About Us
           </Link>
+          <a 
+            href="https://shop.play8.ai" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-indigo-600 font-medium"
+          >
+            Shop
+          </a>
         </div>
       </div>
       
@@ -50,13 +61,13 @@ export function Navbar() {
             >
               Home
             </Link>
-            <Link 
-              to="/booking" 
+            <a 
+              href="/#booking" 
               className="text-gray-700 hover:text-indigo-600 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Booking
-            </Link>
+            </a>
             <Link 
               to="/about" 
               className="text-gray-700 hover:text-indigo-600 font-medium py-2"
@@ -64,6 +75,15 @@ export function Navbar() {
             >
               About Us
             </Link>
+            <a 
+              href="https://shop.play8.ai" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-700 hover:text-indigo-600 font-medium py-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Shop
+            </a>
           </div>
         </div>
       )}
