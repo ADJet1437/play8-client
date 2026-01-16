@@ -40,7 +40,7 @@ export function Navbar() {
             About Us
           </Link>
           <a 
-            href="https://shop.play8.ai" 
+            href="https://store.play8.ai" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-gray-700 hover:text-indigo-600 font-medium"
@@ -76,7 +76,7 @@ export function Navbar() {
               About Us
             </Link>
             <a 
-              href="https://shop.play8.ai" 
+              href="https://store.play8.ai" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-gray-700 hover:text-indigo-600 font-medium py-2"
