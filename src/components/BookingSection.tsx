@@ -10,10 +10,10 @@ export function BookingSection() {
   const { machines } = useMachines();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleCreateBooking = async (booking: Omit<Booking, 'id'>) => {
+  const handleCreateBooking = async (booking: Omit<Booking, 'id' | 'user_id'>) => {
     setIsSubmitting(true);
     try {
-      await createBooking(booking);
+      await createBooking(booking as Omit<Booking, 'id'>);
     } finally {
       setIsSubmitting(false);
     }

@@ -3,22 +3,35 @@ import { format } from 'date-fns';
 import { Button } from './Button';
 import { useMachines } from '../hooks/useMachines';
 import { Booking } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { LoginModal } from './LoginModal';
 
 interface BookingFormProps {
-  onSubmit: (booking: Omit<Booking, 'id'>) => Promise<void>;
+  onSubmit: (booking: Omit<Booking, 'id' | 'user_id'>) => Promise<void>;
   isLoading: boolean;
 }
 
 export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
   const { machines, loading: loadingMachines } = useMachines();
-  const [userId] = useState<string>('user-1'); // Default user ID
+  const { isAuthenticated } = useAuth();
   const [machineId, setMachineId] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store current location for redirect after login
+      const currentUrl = window.location.pathname + window.location.hash;
+      setShowLoginModal(true);
+      // Store the return URL in case user closes modal and logs in from navbar
+      sessionStorage.setItem('oauth_return_url', currentUrl);
+      return;
+    }
     
     if (!machineId) {
       setFormError('Please select a machine');
@@ -32,7 +45,6 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
     
     try {
       await onSubmit({
-        user_id: userId,
         machine_id: machineId,
         start_time: new Date(startTime).toISOString(),
         status: 'active',
@@ -51,16 +63,17 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
   const minDateTime = format(now, "yyyy-MM-dd'T'HH:mm");
   
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Book a Tennis Ball Machine</h2>
-      
-      {formError && (
-        <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
-          {formError}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit}>
+    <>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Book a Tennis Ball Machine</h2>
+        
+        {formError && (
+          <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
+            {formError}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           <div>
             <label htmlFor="machine" className="block text-sm font-medium text-gray-700 mb-1">
@@ -114,5 +127,19 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
         </div>
       </form>
     </div>
+    
+    <LoginModal
+      isOpen={showLoginModal}
+      onClose={() => setShowLoginModal(false)}
+      onLoginSuccess={() => {
+        setShowLoginModal(false);
+        // Retry form submission after login
+        const form = document.querySelector('form');
+        if (form) {
+          form.requestSubmit();
+        }
+      }}
+    />
+    </>
   );
 }

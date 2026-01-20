@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from './Logo';
 import { FiMenu, FiX } from 'react-icons/fi';
+import { UserProfile } from './UserProfile';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from './Button';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, login } = useAuth();
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -47,6 +51,17 @@ export function Navbar() {
           >
             Shop
           </a>
+          {isAuthenticated ? (
+            <UserProfile />
+          ) : (
+            <Button
+              onClick={() => login(window.location.pathname + window.location.hash)}
+              variant="primary"
+              className="px-4 py-2"
+            >
+              Login
+            </Button>
+          )}
         </div>
       </div>
       
@@ -84,6 +99,23 @@ export function Navbar() {
             >
               Shop
             </a>
+            <div className="pt-4 border-t border-gray-200">
+              {isAuthenticated ? (
+                <UserProfile />
+              ) : (
+                <Button
+                  onClick={() => {
+                    login(window.location.pathname + window.location.hash);
+                    setIsMenuOpen(false);
+                  }}
+                  variant="primary"
+                  fullWidth
+                  className="w-full"
+                >
+                  Login
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}

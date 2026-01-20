@@ -14,7 +14,7 @@ export interface DeleteResponse {
 // Model Types
 export interface Booking {
   id?: string;
-  user_id: string;
+  user_id?: string; // Optional because it's set by backend from authenticated user
   machine_id: string;
   start_time: string; // ISO date string
   end_time?: string; // ISO date string, optional as it can be set later
