@@ -9,7 +9,7 @@ interface LoginModalProps {
   onLoginSuccess?: () => void;
 }
 
-export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
+export function LoginModal({ isOpen, onClose, onLoginSuccess: _onLoginSuccess }: LoginModalProps) {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 

@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { FiUser, FiLogOut, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiLogOut, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
-import { Button } from './Button';
 
 export function UserProfile() {
   const { user, logout } = useAuth();
