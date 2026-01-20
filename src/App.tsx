@@ -15,6 +15,8 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          {/* OAuth callback route - AuthContext handles the callback logic */}
+          <Route path="/auth/google/callback" element={<HomePage />} />
         </Routes>
       </Layout>
     </Router>
