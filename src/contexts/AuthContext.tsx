@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { authApi } from '../services/api';
 
 export interface User {
@@ -73,17 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // Check auth status when returning from OAuth callback
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    if (code) {
-      // Handle OAuth callback
-      handleOAuthCallback(code);
-    }
-  }, []);
-
-  const handleOAuthCallback = async (code: string) => {
+  const handleOAuthCallback = useCallback(async (code: string) => {
     try {
       setLoading(true);
       await authApi.handleGoogleCallback(code);
@@ -113,7 +103,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Check auth status when returning from OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+      // Handle OAuth callback
+      handleOAuthCallback(code);
+    }
+  }, [handleOAuthCallback]);
 
   return (
     <AuthContext.Provider
