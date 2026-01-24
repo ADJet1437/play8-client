@@ -1,0 +1,23 @@
+{
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "close": "Close",
+  "submit": "Submit",
+  "confirm": "Confirm",
+  "yes": "Yes",
+  "no": "No",
+  "unknown": "Unknown",
+  "na": "N/A",
+  "ongoing": "Ongoing",
+  "minutes": "minutes",
+  "minute": "minute",
+  "hours": "hours",
+  "hour": "hour",
+  "min": "min"
+}
+

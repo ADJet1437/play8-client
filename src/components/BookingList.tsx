@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { Booking, Machine } from '../types';
 import { Button } from './Button';
@@ -10,13 +11,14 @@ interface BookingListProps {
 }
 
 export function BookingList({ bookings, machines, onEndBooking, isLoading }: BookingListProps) {
+  const { t } = useTranslation('booking');
   // Filter active bookings
   const activeBookings = bookings.filter(booking => booking.status === 'active');
   
   // Get machine name by id
   const getMachineName = (machineId: string) => {
     const machine = machines.find(m => m.id === machineId);
-    return machine ? machine.name : 'Unknown Machine';
+    return machine ? machine.name : t('history.unknownMachine');
   };
   
   // Format date for display
@@ -31,15 +33,15 @@ export function BookingList({ bookings, machines, onEndBooking, isLoading }: Boo
   if (activeBookings.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 text-center">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Active Bookings</h2>
-        <p className="text-gray-600">You don't have any active bookings.</p>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('activeBookings.title')}</h2>
+        <p className="text-gray-600">{t('activeBookings.noActiveBookings')}</p>
       </div>
     );
   }
   
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Your Active Bookings</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">{t('activeBookings.title')}</h2>
       
       <div className="space-y-4">
         {activeBookings.map((booking) => (
@@ -52,10 +54,10 @@ export function BookingList({ bookings, machines, onEndBooking, isLoading }: Boo
                 {getMachineName(booking.machine_id)}
               </h3>
               <p className="text-sm text-gray-600">
-                Started: {formatDate(booking.start_time)}
+                {t('activeBookings.started')}: {formatDate(booking.start_time)}
               </p>
               <p className="text-sm text-gray-600">
-                Status: <span className="text-green-600 font-medium">Active</span>
+                {t('activeBookings.status')}: <span className="text-green-600 font-medium">{t('activeBookings.active')}</span>
               </p>
             </div>
             
@@ -66,7 +68,7 @@ export function BookingList({ bookings, machines, onEndBooking, isLoading }: Boo
               isLoading={isLoading}
               disabled={isLoading}
             >
-              End Session
+              {t('activeBookings.endSession')}
             </Button>
           </div>
         ))}

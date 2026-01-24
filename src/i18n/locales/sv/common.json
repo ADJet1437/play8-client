@@ -1,0 +1,23 @@
+{
+  "loading": "Laddar...",
+  "error": "Fel",
+  "success": "Framgång",
+  "cancel": "Avbryt",
+  "save": "Spara",
+  "delete": "Radera",
+  "edit": "Redigera",
+  "close": "Stäng",
+  "submit": "Skicka",
+  "confirm": "Bekräfta",
+  "yes": "Ja",
+  "no": "Nej",
+  "unknown": "Okänt",
+  "na": "N/A",
+  "ongoing": "Pågående",
+  "minutes": "minuter",
+  "minute": "minut",
+  "hours": "timmar",
+  "hour": "timme",
+  "min": "min"
+}
+

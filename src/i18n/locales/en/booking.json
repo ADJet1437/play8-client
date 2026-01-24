@@ -1,0 +1,35 @@
+{
+  "title": "Book a Tennis Ball Machine",
+  "selectMachine": "Select Machine",
+  "selectMachinePlaceholder": "Select a machine",
+  "startTime": "Start Time",
+  "endSessionNote": "You can end your session manually after starting.",
+  "bookNow": "Book Now",
+  "pleaseSelectMachine": "Please select a machine",
+  "pleaseSelectStartTime": "Please select a start time",
+  "failedToCreate": "Failed to create booking. Please try again.",
+  "history": {
+    "title": "Booking History",
+    "noBookings": "You don't have any completed bookings yet.",
+    "machine": "Machine",
+    "date": "Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "duration": "Duration",
+    "unknownMachine": "Unknown Machine",
+    "unknownDuration": "Unknown duration"
+  },
+  "section": {
+    "title": "Book Your Practice Session",
+    "subtitle": "Choose a machine and time that works for you. Our booking system is simple and flexible."
+  },
+  "activeBookings": {
+    "title": "Your Active Bookings",
+    "noActiveBookings": "You don't have any active bookings.",
+    "started": "Started",
+    "status": "Status",
+    "active": "Active",
+    "endSession": "End Session"
+  }
+}
+

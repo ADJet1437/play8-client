@@ -1,0 +1,39 @@
+{
+  "hero": {
+    "title": "Lyft din tennisspel med Play",
+    "titleHighlight": "8",
+    "subtitle": "Boka våra premium tennisbollsmaskiner och träna i ditt eget tempo. Perfekta din teknik, förbättra dina reflexer och ta ditt spel till nästa nivå.",
+    "bookMachine": "Boka en maskin",
+    "learnMore": "Läs mer"
+  },
+  "features": {
+    "title": "Varför välja Play8?",
+    "subtitle": "Våra tennisbollsmaskiner ger den perfekta träningspartnern, tillgänglig när du vill.",
+    "flexibleScheduling": {
+      "title": "Flexibel schemaläggning",
+      "description": "Boka din träningspass när det passar dig. Börja när du vill och avsluta när du är klar."
+    },
+    "precisionTraining": {
+      "title": "Precisionsträning",
+      "description": "Våra maskiner levererar konsekvent bollplacering för att hjälpa dig fokusera på specifika delar av ditt spel."
+    },
+    "customizableSettings": {
+      "title": "Anpassningsbara inställningar",
+      "description": "Justera hastighet, rotation och bana för att matcha din skicklighetsnivå och träningsmål."
+    },
+    "trackProgress": {
+      "title": "Spåra din utveckling",
+      "description": "Granska din bokningshistorik för att se hur ofta du tränar och planera din förbättring."
+    }
+  },
+  "testimonials": {
+    "title": "Vad våra spelare säger",
+    "subtitle": "Ta inte bara vårt ord för det. Här är vad tennisentusiaster tycker om Play8."
+  },
+  "cta": {
+    "title": "Redo att förbättra ditt tennisspel?",
+    "subtitle": "Boka en tennisbollsmaskin nu och ta dina färdigheter till nästa nivå. Våra maskiner finns tillgängliga på bekväma platser och tider.",
+    "button": "Boka en maskin nu"
+  }
+}
+

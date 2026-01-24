@@ -1,0 +1,39 @@
+{
+  "hero": {
+    "title": "Elevate Your Tennis Game with Play",
+    "titleHighlight": "8",
+    "subtitle": "Book our premium tennis ball machines and practice at your own pace. Perfect your technique, improve your reflexes, and take your game to the next level.",
+    "bookMachine": "Book a Machine",
+    "learnMore": "Learn More"
+  },
+  "features": {
+    "title": "Why Choose Play8?",
+    "subtitle": "Our tennis ball machines provide the perfect practice partner, available whenever you are.",
+    "flexibleScheduling": {
+      "title": "Flexible Scheduling",
+      "description": "Book your practice session at a time that works for you. Start when you want and end when you're done."
+    },
+    "precisionTraining": {
+      "title": "Precision Training",
+      "description": "Our machines deliver consistent ball placement to help you focus on specific areas of your game."
+    },
+    "customizableSettings": {
+      "title": "Customizable Settings",
+      "description": "Adjust speed, spin, and trajectory to match your skill level and training goals."
+    },
+    "trackProgress": {
+      "title": "Track Your Progress",
+      "description": "Review your booking history to see how often you practice and plan your improvement."
+    }
+  },
+  "testimonials": {
+    "title": "What Our Players Say",
+    "subtitle": "Don't just take our word for it. Here's what tennis enthusiasts think about Play8."
+  },
+  "cta": {
+    "title": "Ready to Improve Your Tennis Game?",
+    "subtitle": "Book a tennis ball machine now and take your skills to the next level. Our machines are available at convenient locations and times.",
+    "button": "Book a Machine Now"
+  }
+}
+

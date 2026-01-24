@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiX } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './Button';
@@ -10,6 +11,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, onLoginSuccess: _onLoginSuccess }: LoginModalProps) {
+  const { t } = useTranslation('auth');
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,9 +42,9 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess: _onLoginSuccess }:
         </button>
 
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Login Required</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('loginRequired')}</h2>
           <p className="text-gray-600 mb-6">
-            Please log in with your Google account to book a machine.
+            {t('loginMessage')}
           </p>
 
           <Button
@@ -73,11 +75,11 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess: _onLoginSuccess }:
                 />
               </svg>
             )}
-            Continue with Google
+            {t('continueWithGoogle')}
           </Button>
 
           <p className="text-xs text-gray-500 mt-4">
-            By continuing, you agree to our Terms of Service and Privacy Policy.
+            {t('termsAgreement')}
           </p>
         </div>
       </div>

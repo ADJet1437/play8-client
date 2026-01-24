@@ -1,0 +1,40 @@
+{
+  "title": "Hantering av bollmaskinsbokningar",
+  "errorLoadingData": "Fel vid laddning av data",
+  "statistics": {
+    "totalBookings": "Totalt antal bokningar",
+    "availableMachines": "Tillgängliga maskiner",
+    "activeSessions": "Aktiva sessioner"
+  },
+  "bookings": {
+    "title": "Senaste bokningar",
+    "loading": "Laddar bokningar...",
+    "noBookings": "Inga bokningar hittades",
+    "userId": "Användar-ID",
+    "machine": "Maskin",
+    "startTime": "Starttid",
+    "endTime": "Sluttid",
+    "duration": "Varaktighet",
+    "status": "Status"
+  },
+  "machines": {
+    "title": "Bollmaskiner",
+    "loading": "Laddar maskiner...",
+    "noMachines": "Inga maskiner hittades",
+    "machineId": "Maskin-ID",
+    "name": "Namn",
+    "location": "Plats",
+    "status": "Status"
+  },
+  "status": {
+    "active": "aktiv",
+    "confirmed": "bekräftad",
+    "completed": "slutförd",
+    "cancelled": "avbruten",
+    "pending": "väntande",
+    "available": "tillgänglig",
+    "maintenance": "underhåll",
+    "unavailable": "otillgänglig"
+  }
+}
+

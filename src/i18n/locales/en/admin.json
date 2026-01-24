@@ -1,0 +1,40 @@
+{
+  "title": "Ball Machine Booking Management",
+  "errorLoadingData": "Error loading data",
+  "statistics": {
+    "totalBookings": "Total Bookings",
+    "availableMachines": "Available Machines",
+    "activeSessions": "Active Sessions"
+  },
+  "bookings": {
+    "title": "Recent Bookings",
+    "loading": "Loading bookings...",
+    "noBookings": "No bookings found",
+    "userId": "User ID",
+    "machine": "Machine",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "duration": "Duration",
+    "status": "Status"
+  },
+  "machines": {
+    "title": "Ball Machines",
+    "loading": "Loading machines...",
+    "noMachines": "No machines found",
+    "machineId": "Machine ID",
+    "name": "Name",
+    "location": "Location",
+    "status": "Status"
+  },
+  "status": {
+    "active": "active",
+    "confirmed": "confirmed",
+    "completed": "completed",
+    "cancelled": "cancelled",
+    "pending": "pending",
+    "available": "available",
+    "maintenance": "maintenance",
+    "unavailable": "unavailable"
+  }
+}
+

@@ -1,0 +1,35 @@
+{
+  "title": "Boka en tennisbollsmaskin",
+  "selectMachine": "Välj maskin",
+  "selectMachinePlaceholder": "Välj en maskin",
+  "startTime": "Starttid",
+  "endSessionNote": "Du kan avsluta din session manuellt efter start.",
+  "bookNow": "Boka nu",
+  "pleaseSelectMachine": "Vänligen välj en maskin",
+  "pleaseSelectStartTime": "Vänligen välj en starttid",
+  "failedToCreate": "Kunde inte skapa bokning. Försök igen.",
+  "history": {
+    "title": "Bokningshistorik",
+    "noBookings": "Du har inga slutförda bokningar ännu.",
+    "machine": "Maskin",
+    "date": "Datum",
+    "startTime": "Starttid",
+    "endTime": "Sluttid",
+    "duration": "Varaktighet",
+    "unknownMachine": "Okänd maskin",
+    "unknownDuration": "Okänd varaktighet"
+  },
+  "section": {
+    "title": "Boka ditt träningspass",
+    "subtitle": "Välj en maskin och tid som passar dig. Vårt bokningssystem är enkelt och flexibelt."
+  },
+  "activeBookings": {
+    "title": "Dina aktiva bokningar",
+    "noActiveBookings": "Du har inga aktiva bokningar.",
+    "started": "Startade",
+    "status": "Status",
+    "active": "Aktiv",
+    "endSession": "Avsluta session"
+  }
+}
+

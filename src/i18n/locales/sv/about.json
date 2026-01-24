@@ -1,0 +1,31 @@
+{
+  "title": "Om Play8",
+  "intro": "På Play8 brinner vi för tennis och hjälper spelare på alla nivåer att förbättra sitt spel. Vårt namn representerar vårt engagemang för att erbjuda oändliga möjligheter för din tennisträning.",
+  "founded": "Grundad 2023 av en grupp tennisentusiaster, föddes Play8 från en enkel idé: göra högkvalitativa tennisbollsmaskiner tillgängliga för alla genom ett enkelt bokningssystem.",
+  "mission": {
+    "title": "Vårt uppdrag",
+    "content": "Vårt uppdrag är att hjälpa tennisspelare att träna effektivt enligt egen tidtabell. Vi tror att konsekvent träning är nyckeln till förbättring, och våra bollmaskiner ger den perfekta möjligheten för fokuserad, repetitiv träning."
+  },
+  "machines": {
+    "title": "Våra maskiner",
+    "description": "Vi erbjuder toppmoderna tennisbollsmaskiner på olika platser. Våra maskiner har:",
+    "features": {
+      "adjustableSpeed": "Justerbar hastighet och rotationsinställningar",
+      "programmablePatterns": "Programmerbara skottmönster",
+      "ballCapacity": "Bollkapacitet på 150+ bollar",
+      "batteryLife": "Batteritid på upp till 4-6 timmar",
+      "remoteControl": "Fjärrstyrning"
+    }
+  },
+  "howItWorks": {
+    "title": "Hur det fungerar",
+    "description": "Vårt bokningssystem är designat för att vara enkelt och flexibelt:",
+    "steps": {
+      "select": "Välj en maskin på din föredragna plats",
+      "book": "Boka din föredragna tidslucka",
+      "practice": "Träna och förbättra ditt spel",
+      "end": "Avsluta din session när du är klar"
+    }
+  }
+}
+

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { format, parseISO, differenceInMinutes } from 'date-fns';
 import { Booking, Machine } from '../types';
 
@@ -15,10 +16,12 @@ export function BookingHistory({ bookings, machines }: BookingHistoryProps) {
     return new Date(b.start_time).getTime() - new Date(a.start_time).getTime();
   });
   
+  const { t } = useTranslation(['booking', 'common']);
+  
   // Get machine name by id
   const getMachineName = (machineId: string) => {
     const machine = machines.find(m => m.id === machineId);
-    return machine ? machine.name : 'Unknown Machine';
+    return machine ? machine.name : t('booking:history.unknownMachine');
   };
   
   // Calculate session duration
@@ -29,48 +32,50 @@ export function BookingHistory({ bookings, machines }: BookingHistoryProps) {
       const minutes = differenceInMinutes(end, start);
       
       if (minutes < 60) {
-        return `${minutes} minutes`;
+        return `${minutes} ${t('common:minutes')}`;
       } else {
         const hours = Math.floor(minutes / 60);
         const remainingMinutes = minutes % 60;
-        return `${hours} hour${hours > 1 ? 's' : ''}${remainingMinutes > 0 ? ` ${remainingMinutes} min` : ''}`;
+        const hoursText = hours === 1 ? t('common:hour') : t('common:hours');
+        const minsText = remainingMinutes > 0 ? ` ${remainingMinutes} ${t('common:min')}` : '';
+        return `${hours} ${hoursText}${minsText}`;
       }
     } catch (error) {
-      return 'Unknown duration';
+      return t('booking:history.unknownDuration');
     }
   };
   
   if (completedBookings.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 text-center">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Booking History</h2>
-        <p className="text-gray-600">You don't have any completed bookings yet.</p>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('booking:history.title')}</h2>
+        <p className="text-gray-600">{t('booking:history.noBookings')}</p>
       </div>
     );
   }
   
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Booking History</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">{t('booking:history.title')}</h2>
       
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Machine
+                {t('booking:history.machine')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
+                {t('booking:history.date')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Start Time
+                {t('booking:history.startTime')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                End Time
+                {t('booking:history.endTime')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Duration
+                {t('booking:history.duration')}
               </th>
             </tr>
           </thead>

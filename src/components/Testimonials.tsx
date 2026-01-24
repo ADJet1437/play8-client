@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { FiStar } from 'react-icons/fi';
 
 export function Testimonials() {
+  const { t } = useTranslation('home');
   const testimonials = [
     {
       name: 'Sarah Johnson',
@@ -29,9 +31,9 @@ export function Testimonials() {
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">What Our Players Say</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('testimonials.title')}</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what tennis enthusiasts think about Play8.
+            {t('testimonials.subtitle')}
           </p>
         </div>
         

@@ -1,0 +1,30 @@
+{
+  "title": "About Play8",
+  "intro": "At Play8, we're passionate about tennis and helping players of all levels improve their game. Our name represents our commitment to providing infinite possibilities for your tennis practice.",
+  "founded": "Founded in 2023 by a group of tennis enthusiasts, Play8 was born from a simple idea: make high-quality tennis ball machines accessible to everyone through an easy booking system.",
+  "mission": {
+    "title": "Our Mission",
+    "content": "Our mission is to help tennis players practice effectively on their own schedule. We believe that consistent practice is the key to improvement, and our ball machines provide the perfect opportunity for focused, repetitive training."
+  },
+  "machines": {
+    "title": "Our Machines",
+    "description": "We offer state-of-the-art tennis ball machines at various locations. Our machines feature:",
+    "features": {
+      "adjustableSpeed": "Adjustable speed and spin settings",
+      "programmablePatterns": "Programmable shot patterns",
+      "ballCapacity": "Ball capacity of 150+ balls",
+      "batteryLife": "Battery life of up to 4-6 hours",
+      "remoteControl": "Remote control operation"
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "description": "Our booking system is designed to be simple and flexible:",
+    "steps": {
+      "select": "Select a machine at your preferred location",
+      "book": "Choose your start time",
+      "practice": "Practice as long as you need",
+      "end": "End your session when you're done"
+    }
+  }
+}

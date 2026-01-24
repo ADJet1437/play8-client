@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Button } from './Button';
 import { useMachines } from '../hooks/useMachines';
@@ -12,6 +13,7 @@ interface BookingFormProps {
 }
 
 export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
+  const { t } = useTranslation('booking');
   const { machines, loading: loadingMachines } = useMachines();
   const { isAuthenticated } = useAuth();
   const [machineId, setMachineId] = useState<string>('');
@@ -34,12 +36,12 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
     }
     
     if (!machineId) {
-      setFormError('Please select a machine');
+      setFormError(t('pleaseSelectMachine'));
       return;
     }
     
     if (!startTime) {
-      setFormError('Please select a start time');
+      setFormError(t('pleaseSelectStartTime'));
       return;
     }
     
@@ -54,7 +56,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
       setMachineId('');
       setStartTime('');
     } catch (error) {
-      setFormError('Failed to create booking. Please try again.');
+      setFormError(t('failedToCreate'));
     }
   };
   
@@ -65,7 +67,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
   return (
     <>
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Book a Tennis Ball Machine</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">{t('title')}</h2>
         
         {formError && (
           <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
@@ -77,7 +79,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
         <div className="space-y-4">
           <div>
             <label htmlFor="machine" className="block text-sm font-medium text-gray-700 mb-1">
-              Select Machine
+              {t('selectMachine')}
             </label>
             <select
               id="machine"
@@ -87,7 +89,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
               disabled={loadingMachines || isLoading}
               required
             >
-              <option value="">Select a machine</option>
+              <option value="">{t('selectMachinePlaceholder')}</option>
               {machines.map((machine) => (
                 <option key={machine.id} value={machine.id}>
                   {machine.name} - {machine.location}
@@ -98,7 +100,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
           
           <div>
             <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-1">
-              Start Time
+              {t('startTime')}
             </label>
             <input
               type="datetime-local"
@@ -111,7 +113,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
               required
             />
             <p className="text-sm text-gray-500 mt-1">
-              You can end your session manually after starting.
+              {t('endSessionNote')}
             </p>
           </div>
           
@@ -122,7 +124,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             isLoading={isLoading}
             disabled={loadingMachines || isLoading}
           >
-            Book Now
+            {t('bookNow')}
           </Button>
         </div>
       </form>

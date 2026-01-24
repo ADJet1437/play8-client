@@ -1,26 +1,28 @@
+import { useTranslation } from 'react-i18next';
 import { FiClock, FiTarget, FiSettings, FiActivity } from 'react-icons/fi';
 
 export function Features() {
+  const { t } = useTranslation('home');
   const features = [
     {
       icon: <FiClock className="w-10 h-10 text-indigo-600" />,
-      title: 'Flexible Scheduling',
-      description: 'Book your practice session at a time that works for you. Start when you want and end when you\'re done.'
+      title: t('features.flexibleScheduling.title'),
+      description: t('features.flexibleScheduling.description')
     },
     {
       icon: <FiTarget className="w-10 h-10 text-indigo-600" />,
-      title: 'Precision Training',
-      description: 'Our machines deliver consistent ball placement to help you focus on specific areas of your game.'
+      title: t('features.precisionTraining.title'),
+      description: t('features.precisionTraining.description')
     },
     {
       icon: <FiSettings className="w-10 h-10 text-indigo-600" />,
-      title: 'Customizable Settings',
-      description: 'Adjust speed, spin, and trajectory to match your skill level and training goals.'
+      title: t('features.customizableSettings.title'),
+      description: t('features.customizableSettings.description')
     },
     {
       icon: <FiActivity className="w-10 h-10 text-indigo-600" />,
-      title: 'Track Your Progress',
-      description: 'Review your booking history to see how often you practice and plan your improvement.'
+      title: t('features.trackProgress.title'),
+      description: t('features.trackProgress.description')
     }
   ];
   
@@ -28,9 +30,9 @@ export function Features() {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Play8?</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('features.title')}</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Our tennis ball machines provide the perfect practice partner, available whenever you are.
+            {t('features.subtitle')}
           </p>
         </div>
         

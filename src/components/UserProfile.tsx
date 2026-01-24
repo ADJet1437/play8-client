@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiLogOut, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 export function UserProfile() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation('navbar');
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -73,7 +75,7 @@ export function UserProfile() {
                 className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50"
               >
                 <FiLogOut />
-                <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                <span>{isLoggingOut ? t('loggingOut') : t('logout')}</span>
               </button>
             </div>
           </div>
