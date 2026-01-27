@@ -66,11 +66,11 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
   
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">{t('title')}</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">{t('title')}</h2>
         
         {formError && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded-md mb-4 border border-red-200 dark:border-red-800">
             {formError}
           </div>
         )}
@@ -78,12 +78,12 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
         <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           <div>
-            <label htmlFor="machine" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="machine" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('selectMachine')}
             </label>
             <select
               id="machine"
-              className="w-full rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400"
               value={machineId}
               onChange={(e) => setMachineId(e.target.value)}
               disabled={loadingMachines || isLoading}
@@ -99,20 +99,20 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
           </div>
           
           <div>
-            <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('startTime')}
             </label>
             <input
               type="datetime-local"
               id="startTime"
-              className="w-full rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               min={minDateTime}
               disabled={isLoading}
               required
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {t('endSessionNote')}
             </p>
           </div>

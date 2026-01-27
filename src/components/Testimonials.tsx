@@ -28,18 +28,18 @@ export function Testimonials() {
   ];
   
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-gray-50 dark:bg-gray-800 transition-colors">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('testimonials.title')}</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('testimonials.title')}</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             {t('testimonials.subtitle')}
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md p-8">
+            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 transition-colors">
               <div className="flex items-center mb-4">
                 <img 
                   src={testimonial.image} 
@@ -47,18 +47,18 @@ export function Testimonials() {
                   className="w-12 h-12 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h3 className="font-semibold text-gray-900">{testimonial.name}</h3>
-                  <p className="text-sm text-gray-600">{testimonial.role}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{testimonial.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
                 </div>
               </div>
               
-              <p className="text-gray-700 mb-4">{testimonial.content}</p>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">{testimonial.content}</p>
               
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <FiStar 
                     key={i}
-                    className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                    className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400 dark:text-yellow-500 fill-current' : 'text-gray-300 dark:text-gray-600'}`}
                   />
                 ))}
               </div>

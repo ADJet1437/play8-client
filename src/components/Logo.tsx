@@ -7,11 +7,11 @@ interface LogoProps {
 export function Logo({ className }: LogoProps) {
   return (
     <div className={cn("flex items-center overflow-visible gap-2", className)}>
-      <span className="font-bold text-gray-800">PLAY</span>
+      <span className="font-bold text-gray-800 dark:text-white">PLAY</span>
       <img
         src="/play8-logo.png"
         alt="Play8 Logo"
-        className="h-10 w-auto logo-spin"
+        className="h-10 w-auto"
       />
     </div>
   );

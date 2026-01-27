@@ -32,32 +32,32 @@ export function BookingList({ bookings, machines, onEndBooking, isLoading }: Boo
   
   if (activeBookings.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 text-center">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('activeBookings.title')}</h2>
-        <p className="text-gray-600">{t('activeBookings.noActiveBookings')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center transition-colors">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('activeBookings.title')}</h2>
+        <p className="text-gray-600 dark:text-gray-400">{t('activeBookings.noActiveBookings')}</p>
       </div>
     );
   }
   
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">{t('activeBookings.title')}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors">
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">{t('activeBookings.title')}</h2>
       
       <div className="space-y-4">
         {activeBookings.map((booking) => (
           <div 
             key={booking.id} 
-            className="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between"
           >
             <div className="mb-4 md:mb-0">
-              <h3 className="font-medium text-gray-800">
+              <h3 className="font-medium text-gray-800 dark:text-gray-200">
                 {getMachineName(booking.machine_id)}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t('activeBookings.started')}: {formatDate(booking.start_time)}
               </p>
-              <p className="text-sm text-gray-600">
-                {t('activeBookings.status')}: <span className="text-green-600 font-medium">{t('activeBookings.active')}</span>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {t('activeBookings.status')}: <span className="text-green-600 dark:text-green-400 font-medium">{t('activeBookings.active')}</span>
               </p>
             </div>
             
