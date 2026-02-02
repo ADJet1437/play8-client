@@ -1,0 +1,18 @@
+{
+  "title": "Hur man kommer igång",
+  "subtitle": "",
+  "label": "DIN TENNISKOMPANJON",
+  "titleHighlight": "proffs",
+  "cta": "Börja gratis",
+  "book": "Boka",
+  "cards": {
+    "practiceModes": "Träningslägen",
+    "sessionAnalytics": "Sessionsanalys",
+    "spinSettings": "Spinninställningar",
+    "speedControl": "Hastighetskontroll",
+    "appControl": "Appstyrning",
+    "customDrills": "Anpassade Övningar",
+    "videoReplay": "Videorepriser",
+    "smartTracking": "Smart Spårning"
+  }
+}

@@ -10,6 +10,7 @@ import enAbout from './locales/en/about.json';
 import enFooter from './locales/en/footer.json';
 import enAuth from './locales/en/auth.json';
 import enAdmin from './locales/en/admin.json';
+import enTutorial from './locales/en/tutorial.json';
 
 import svCommon from './locales/sv/common.json';
 import svNavbar from './locales/sv/navbar.json';
@@ -19,6 +20,7 @@ import svAbout from './locales/sv/about.json';
 import svFooter from './locales/sv/footer.json';
 import svAuth from './locales/sv/auth.json';
 import svAdmin from './locales/sv/admin.json';
+import svTutorial from './locales/sv/tutorial.json';
 
 const resources = {
   en: {
@@ -30,6 +32,7 @@ const resources = {
     footer: enFooter,
     auth: enAuth,
     admin: enAdmin,
+    tutorial: enTutorial,
   },
   sv: {
     common: svCommon,
@@ -40,6 +43,7 @@ const resources = {
     footer: svFooter,
     auth: svAuth,
     admin: svAdmin,
+    tutorial: svTutorial,
   },
 };
 
@@ -50,7 +54,7 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'navbar', 'home', 'booking', 'about', 'footer', 'auth', 'admin'],
+    ns: ['common', 'navbar', 'home', 'booking', 'about', 'footer', 'auth', 'admin', 'tutorial'],
     interpolation: {
       escapeValue: false, // React already escapes values
     },

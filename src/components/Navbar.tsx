@@ -35,9 +35,6 @@ export function Navbar() {
         
         {/* Desktop menu */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">
-            {t('home')}
-          </Link>
           <a 
             href="/#booking" 
             className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
@@ -50,7 +47,7 @@ export function Navbar() {
             rel="noopener noreferrer"
             className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
           >
-            {t('shop')}
+            {t('store')}
           </a>
           <ThemeToggle />
           <LanguageSwitcher />
@@ -72,13 +69,6 @@ export function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden mt-4 bg-white dark:bg-gray-800 transition-colors">
           <div className="flex flex-col space-y-4 px-4 py-2">
-            <Link 
-              to="/" 
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {t('home')}
-            </Link>
             <a 
               href="/#booking" 
               className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
@@ -93,7 +83,7 @@ export function Navbar() {
               className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              {t('shop')}
+              {t('store')}
             </a>
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="mb-4 flex items-center space-x-4">
