@@ -55,9 +55,12 @@
   }
   html {
     scroll-behavior: smooth;
+    height: 100%;
   }
   body {
     @apply bg-background text-foreground;
     font-family: 'Jost', sans-serif;
+    height: 100%;
+    overflow-x: hidden;
   }
 }
