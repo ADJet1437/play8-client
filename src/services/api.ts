@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Booking, DeleteResponse, Machine, PagedResponse } from '../types';
+import { Booking, Conversation, ConversationDetail, DeleteResponse, Machine, PagedResponse, PlanItem, PlanItemCreate } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001/api/v1';
 
@@ -88,6 +88,68 @@ export const machineApi = {
   
   delete: async (id: string): Promise<DeleteResponse> => {
     const response = await api.delete<DeleteResponse>(`/machines/${id}`);
+    return response.data;
+  },
+};
+
+// Conversation API
+export const conversationApi = {
+  list: async (limit = 100, offset = 0): Promise<PagedResponse<Conversation>> => {
+    const response = await api.get<PagedResponse<Conversation>>('/agent/conversations', {
+      params: { limit, offset },
+    });
+    return response.data;
+  },
+
+  get: async (id: string): Promise<ConversationDetail> => {
+    const response = await api.get<ConversationDetail>(`/agent/conversations/${id}`);
+    return response.data;
+  },
+
+  create: async (): Promise<Conversation> => {
+    const response = await api.post<Conversation>('/agent/conversations');
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<DeleteResponse> => {
+    const response = await api.delete<DeleteResponse>(`/agent/conversations/${id}`);
+    return response.data;
+  },
+};
+
+// Card Progress API
+export const cardProgressApi = {
+  update: async (contentBlockId: string, checkedSteps: boolean[]): Promise<{ content_block_id: string; checked_steps: boolean[] }> => {
+    const response = await api.put<{ content_block_id: string; checked_steps: boolean[] }>(
+      `/agent/cards/${contentBlockId}/progress`,
+      { checked_steps: checkedSteps }
+    );
+    return response.data;
+  },
+};
+
+// Plan API
+export const planApi = {
+  list: async (): Promise<PlanItem[]> => {
+    const response = await api.get<PlanItem[]>('/plan/items');
+    return response.data;
+  },
+
+  add: async (card: PlanItemCreate): Promise<PlanItem> => {
+    const response = await api.post<PlanItem>('/plan/items', card);
+    return response.data;
+  },
+
+  updateProgress: async (itemId: string, checkedSteps: boolean[]): Promise<PlanItem> => {
+    const response = await api.put<PlanItem>(
+      `/plan/items/${itemId}/progress`,
+      { checked_steps: checkedSteps }
+    );
+    return response.data;
+  },
+
+  remove: async (itemId: string): Promise<DeleteResponse> => {
+    const response = await api.delete<DeleteResponse>(`/plan/items/${itemId}`);
     return response.data;
   },
 };
