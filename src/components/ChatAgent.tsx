@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { FiSend, FiX, FiMessageCircle } from 'react-icons/fi';
-import { useTranslation } from 'react-i18next';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,7 +12,6 @@ interface ChatAgentProps {
 }
 
 export function ChatAgent({ isOpen, onClose }: ChatAgentProps) {
-  const { t } = useTranslation('common');
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',

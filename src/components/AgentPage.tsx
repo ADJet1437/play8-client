@@ -46,14 +46,15 @@ const CompactMarkdownComponents = {
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h3 className="text-sm font-semibold mb-2 mt-2 first:mt-0">{children}</h3>
   ),
-  code: ({ className, children, ...props }: { className?: string; children?: React.ReactNode; [key: string]: unknown }) => {
+  code: (props: React.HTMLAttributes<HTMLElement>) => {
+    const { className, children, ...rest } = props;
     const isInline = !className;
     return isInline ? (
-      <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+      <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs font-mono" {...rest}>
         {children}
       </code>
     ) : (
-      <code className="block bg-gray-900 dark:bg-gray-950 text-gray-100 p-2 rounded text-xs font-mono overflow-x-auto whitespace-pre" {...props}>
+      <code className="block bg-gray-900 dark:bg-gray-950 text-gray-100 p-2 rounded text-xs font-mono overflow-x-auto whitespace-pre" {...rest}>
         {children}
       </code>
     );
@@ -100,14 +101,15 @@ const MarkdownComponents = {
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h3 className="text-lg font-semibold mb-2 mt-4 first:mt-0">{children}</h3>
   ),
-  code: ({ className, children, ...props }: { className?: string; children?: React.ReactNode; [key: string]: unknown }) => {
+  code: (props: React.HTMLAttributes<HTMLElement>) => {
+    const { className, children, ...rest } = props;
     const isInline = !className;
     return isInline ? (
-      <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200" {...props}>
+      <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200" {...rest}>
         {children}
       </code>
     ) : (
-      <code className="block bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg text-sm font-mono overflow-x-auto whitespace-pre" {...props}>
+      <code className="block bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg text-sm font-mono overflow-x-auto whitespace-pre" {...rest}>
         {children}
       </code>
     );
