@@ -183,6 +183,8 @@ export function AgentPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const hasProcessedInitialMessage = useRef(false);
   const loadedConversationRef = useRef<string | null>(null);
+  /** When we navigate to /agent/:id from stream (new conversation), skip loading so we don't overwrite local messages */
+  const conversationIdFromStreamRef = useRef<string | null>(null);
 
   // Determine if chat is in compact mode (narrow width)
   const isCompactChat = chatWidthPercent < 40;
@@ -339,6 +341,7 @@ export function AgentPage() {
               if (data.conversation_id && !convId) {
                 convId = data.conversation_id;
                 if (!urlConversationId) {
+                  conversationIdFromStreamRef.current = data.conversation_id;
                   navigate(`/agent/${data.conversation_id}`, { replace: true });
                 }
               }
@@ -516,10 +519,18 @@ export function AgentPage() {
   useEffect(() => {
     if (!isAuthenticated) return;
     if (urlConversationId) {
+      // Don't load when we just navigated here from our own stream (new conversation);
+      // local state already has the user message and streaming assistant reply.
+      if (conversationIdFromStreamRef.current === urlConversationId) {
+        conversationIdFromStreamRef.current = null;
+        loadedConversationRef.current = urlConversationId;
+        return;
+      }
       loadConversation(urlConversationId);
     } else {
       // Empty state: clear everything
       loadedConversationRef.current = null;
+      conversationIdFromStreamRef.current = null;
       setMessages([]);
       setGeneratedCards([]);
       setInput('');
