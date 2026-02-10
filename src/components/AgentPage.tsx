@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import { FiArrowUp, FiMessageCircle, FiBookOpen, FiMoreVertical } from 'react-icons/fi';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { FiArrowUp, FiMessageCircle, FiBookOpen, FiMoreVertical, FiSidebar } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { StudioSidebar } from './studio/StudioSidebar';
+import { ConversationSidebar } from './ConversationSidebar';
+import { cardProgressApi, conversationApi } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import { Conversation, StreamingStudioCard } from '../types';
 
 // Constants for panel sizing
 const DEFAULT_CHAT_WIDTH = 33; // Chat takes 1/3 by default
@@ -145,9 +149,19 @@ const MarkdownComponents = {
 };
 
 export function AgentPage() {
+  const { conversationId: urlConversationId } = useParams();
+  const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as LocationState | null;
   const initialMessage = locationState?.initialMessage;
+  const { isAuthenticated, login } = useAuth();
+
+  // Conversation state
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Generated studio cards state
+  const [generatedCards, setGeneratedCards] = useState<StreamingStudioCard[]>([]);
 
   // Initialize messages with the initial message if provided
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -159,16 +173,27 @@ export function AgentPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(() => !!initialMessage?.trim());
   const [isStreaming, setIsStreaming] = useState(false);
-  const [mobileTab, setMobileTab] = useState<'chat' | 'studio'>('chat');
+  const [mobileTab, setMobileTab] = useState<'chat' | 'studio' | 'history'>('chat');
   const [chatWidthPercent, setChatWidthPercent] = useState(DEFAULT_CHAT_WIDTH);
   const [isDragging, setIsDragging] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasProcessedInitialMessage = useRef(false);
+  const loadedConversationRef = useRef<string | null>(null);
 
   // Determine if chat is in compact mode (narrow width)
   const isCompactChat = chatWidthPercent < 40;
+
+  // Load conversations on mount
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    conversationApi.list().then((res) => {
+      setConversations(res.data);
+    }).catch(() => {
+      // Silently fail — user may not have conversations yet
+    });
+  }, [isAuthenticated]);
 
   // Handle panel resize
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -238,8 +263,32 @@ export function AgentPage() {
     e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
   };
 
+  // Parse tool_use result JSON into StreamingStudioCard(s)
+  const parseToolResultCards = useCallback((result: string): StreamingStudioCard[] => {
+    try {
+      const cards = JSON.parse(result);
+      if (!Array.isArray(cards)) return [];
+      return cards.map((card: Record<string, unknown>) => {
+        const content = card.content as Record<string, unknown> | undefined;
+        return {
+          title: (card.title as string) || '',
+          description: (card.description as string) || '',
+          category: (card.category as StreamingStudioCard['category']) || 'training',
+          difficulty: content?.difficulty as StreamingStudioCard['difficulty'],
+          duration: content?.duration as string | undefined,
+          overview: (content?.overview as string) || '',
+          steps: (content?.steps as string[]) || [],
+          tips: (content?.tips as string[]) || [],
+          isStreaming: false,
+        };
+      });
+    } catch {
+      return [];
+    }
+  }, []);
+
   // Fetch response from API (does not add user message - assumes it's already in state)
-  const fetchResponse = useCallback(async (messageContent: string, conversationHistory: Message[]) => {
+  const fetchResponse = useCallback(async (messageContent: string, conversationHistory: Message[], convId: string | null) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001/api/v1'}/agent/chat`, {
         method: 'POST',
@@ -250,16 +299,22 @@ export function AgentPage() {
         body: JSON.stringify({
           message: messageContent,
           conversation_history: conversationHistory.map(m => ({ role: m.role, content: m.content })),
+          conversation_id: convId,
         }),
       });
 
       if (!response.ok) {
+        if (response.status === 403) {
+          login();
+          return;
+        }
         throw new Error('Failed to get response');
       }
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let assistantMessage = '';
+      let toolArgsBuffer = '';
 
       // Add assistant message placeholder
       setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
@@ -274,10 +329,20 @@ export function AgentPage() {
           const lines = chunk.split('\n');
 
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6));
-                if (data.content) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const data = JSON.parse(line.slice(6));
+
+              // Capture conversation_id from first chunk and update URL
+              if (data.conversation_id && !convId) {
+                convId = data.conversation_id;
+                if (!urlConversationId) {
+                  navigate(`/agent/${data.conversation_id}`, { replace: true });
+                }
+              }
+
+              switch (data.type) {
+                case 'text_delta':
                   assistantMessage += data.content;
                   setMessages((prev) => {
                     const newMessages = [...prev];
@@ -287,10 +352,71 @@ export function AgentPage() {
                     };
                     return newMessages;
                   });
-                }
-              } catch {
-                // Ignore parse errors
+                  break;
+
+                case 'tool_use_start':
+                  toolArgsBuffer = '';
+                  break;
+
+                case 'tool_use_delta':
+                  toolArgsBuffer += data.content;
+                  break;
+
+                case 'tool_use_end':
+                  if (data.result) {
+                    const newCards = parseToolResultCards(data.result);
+                    if (newCards.length > 0) {
+                      setGeneratedCards(prev => [...prev, ...newCards]);
+                    }
+                  }
+                  toolArgsBuffer = '';
+                  break;
+
+                case 'card_saved':
+                  // Update the most recently added cards with their content_block_id
+                  if (data.content_block_id && data.result) {
+                    const savedCards = parseToolResultCards(data.result);
+                    setGeneratedCards(prev => {
+                      const updated = [...prev];
+                      // Match by title to find the cards that were just added
+                      for (const sc of savedCards) {
+                        const idx = updated.findIndex(c => c.title === sc.title && !c.content_block_id);
+                        if (idx >= 0) {
+                          updated[idx] = { ...updated[idx], content_block_id: data.content_block_id };
+                        }
+                      }
+                      return updated;
+                    });
+                  }
+                  break;
+
+                case 'done':
+                  // Update conversation title
+                  if (data.title && convId) {
+                    setConversations((prev) => {
+                      const existing = prev.find(c => c.id === convId);
+                      if (existing) {
+                        return prev.map(c => c.id === convId ? { ...c, title: data.title } : c);
+                      }
+                      return [{
+                        id: convId!,
+                        title: data.title,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                      }, ...prev];
+                    });
+                  } else if (convId && !conversations.find(c => c.id === convId)) {
+                    setConversations((prev) => [{
+                      id: convId!,
+                      title: null,
+                      created_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString(),
+                    }, ...prev]);
+                  }
+                  break;
               }
+            } catch {
+              // Ignore parse errors
             }
           }
         }
@@ -304,11 +430,16 @@ export function AgentPage() {
       setIsLoading(false);
       setIsStreaming(false);
     }
-  }, []);
+  }, [conversations, login, parseToolResultCards, navigate, urlConversationId]);
 
   // Send a new message (adds user message to state, then fetches response)
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
+
+    if (!isAuthenticated) {
+      login();
+      return;
+    }
 
     const trimmed = input.trim();
     const userMessage: Message = { role: 'user', content: trimmed };
@@ -324,17 +455,19 @@ export function AgentPage() {
     }
 
     // Fetch response (user message already added above)
-    fetchResponse(trimmed, messages);
+    fetchResponse(trimmed, messages, urlConversationId ?? null);
   };
 
   // Handle initial message from navigation - user message already in state via useState initializer
   useEffect(() => {
-    if (initialMessage?.trim() && !hasProcessedInitialMessage.current) {
+    if (initialMessage?.trim() && !hasProcessedInitialMessage.current && isAuthenticated) {
       hasProcessedInitialMessage.current = true;
+      // Clear location state so refresh doesn't re-trigger
+      navigate(location.pathname, { replace: true, state: {} });
       // Fetch response immediately - user message is already displayed
-      fetchResponse(initialMessage.trim(), []);
+      fetchResponse(initialMessage.trim(), [], null);
     }
-  }, [initialMessage, fetchResponse]);
+  }, [initialMessage, fetchResponse, isAuthenticated, navigate, location.pathname]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -342,6 +475,123 @@ export function AgentPage() {
       handleSend();
     }
   };
+
+  // Load conversation from API (used by URL effect and sidebar)
+  const loadConversation = useCallback(async (id: string) => {
+    if (loadedConversationRef.current === id) return;
+    loadedConversationRef.current = id;
+    try {
+      const detail = await conversationApi.get(id);
+      setMessages(detail.messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })));
+
+      // Restore cards from content_blocks with checked_steps
+      const restoredCards: StreamingStudioCard[] = [];
+      for (const msg of detail.messages) {
+        if (msg.content_blocks) {
+          for (const block of msg.content_blocks) {
+            if (block.type === 'tool_use' && block.content) {
+              const cards = parseToolResultCards(block.content);
+              for (const card of cards) {
+                card.content_block_id = block.id;
+                if (block.checked_steps) {
+                  card.checked_steps = block.checked_steps;
+                }
+              }
+              restoredCards.push(...cards);
+            }
+          }
+        }
+      }
+      setGeneratedCards(restoredCards);
+      setMobileTab('chat');
+    } catch {
+      // Conversation may have been deleted — redirect to empty state
+      navigate('/agent', { replace: true });
+    }
+  }, [parseToolResultCards, navigate]);
+
+  // Load conversation when URL param changes
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (urlConversationId) {
+      loadConversation(urlConversationId);
+    } else {
+      // Empty state: clear everything
+      loadedConversationRef.current = null;
+      setMessages([]);
+      setGeneratedCards([]);
+      setInput('');
+      setIsLoading(false);
+      setIsStreaming(false);
+    }
+  }, [urlConversationId, isAuthenticated, loadConversation]);
+
+  // Conversation sidebar handlers
+  const handleSelectConversation = (id: string) => {
+    navigate(`/agent/${id}`);
+  };
+
+  const handleNewChat = () => {
+    navigate('/agent');
+    setMobileTab('chat');
+    textareaRef.current?.focus();
+  };
+
+  const handleDeleteConversation = async (id: string) => {
+    try {
+      await conversationApi.delete(id);
+      setConversations((prev) => prev.filter(c => c.id !== id));
+      if (urlConversationId === id) {
+        handleNewChat();
+      }
+    } catch {
+      // Silently fail
+    }
+  };
+
+  // Toggle a step checkbox on a generated card
+  const handleToggleStep = useCallback(async (cardIndex: number, stepIndex: number) => {
+    setGeneratedCards(prev => {
+      const updated = [...prev];
+      const card = updated[cardIndex];
+      if (!card) return prev;
+      const steps = card.checked_steps ?? new Array(card.steps.length).fill(false);
+      const newSteps = [...steps];
+      newSteps[stepIndex] = !newSteps[stepIndex];
+      updated[cardIndex] = { ...card, checked_steps: newSteps };
+
+      // Persist in background
+      if (card.content_block_id) {
+        cardProgressApi.update(card.content_block_id, newSteps).catch(() => {
+          // Silently fail — optimistic update already applied
+        });
+      }
+
+      return updated;
+    });
+  }, []);
+
+  // Auth gate
+  if (!isAuthenticated) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-center px-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Sign in to chat
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
+            Log in to start a conversation with the AI coach and save your chat history.
+          </p>
+          <button
+            onClick={() => login()}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+          >
+            Sign in with Google
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Chat content component (used in both desktop and mobile)
   const renderChatContent = (compact: boolean) => (
@@ -432,12 +682,37 @@ export function AgentPage() {
         ref={containerRef}
         className="hidden md:flex flex-1 min-h-0 overflow-hidden"
       >
+        {/* Conversation Sidebar */}
+        {sidebarOpen && (
+          <div className="w-56 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
+            <ConversationSidebar
+              conversations={conversations}
+              currentConversationId={urlConversationId ?? null}
+              onSelectConversation={handleSelectConversation}
+              onNewChat={handleNewChat}
+              onDeleteConversation={handleDeleteConversation}
+            />
+          </div>
+        )}
+
         {/* Chat Area */}
         <div
-          className="min-w-0 overflow-hidden"
+          className="min-w-0 overflow-hidden flex flex-col"
           style={{ width: `${chatWidthPercent}%` }}
         >
-          {renderChatContent(isCompactChat)}
+          {/* Sidebar toggle */}
+          <div className="flex-shrink-0 flex items-center px-2 py-1 border-b border-gray-100 dark:border-gray-800">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
+              title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+            >
+              <FiSidebar size={16} />
+            </button>
+          </div>
+          <div className="flex-1 min-h-0">
+            {renderChatContent(isCompactChat)}
+          </div>
         </div>
 
         {/* Resize Handle */}
@@ -452,7 +727,7 @@ export function AgentPage() {
 
         {/* Studio Area - Takes remaining space */}
         <div className="flex-1 min-w-0 overflow-hidden">
-          <StudioSidebar conversationText={conversationText} />
+          <StudioSidebar conversationText={conversationText} generatedCards={generatedCards} onToggleStep={handleToggleStep} />
         </div>
       </div>
 
@@ -462,8 +737,16 @@ export function AgentPage() {
         <div className="flex-1 min-h-0 overflow-hidden">
           {mobileTab === 'chat' ? (
             renderChatContent(false)
+          ) : mobileTab === 'history' ? (
+            <ConversationSidebar
+              conversations={conversations}
+              currentConversationId={urlConversationId ?? null}
+              onSelectConversation={handleSelectConversation}
+              onNewChat={handleNewChat}
+              onDeleteConversation={handleDeleteConversation}
+            />
           ) : (
-            <StudioSidebar conversationText={conversationText} />
+            <StudioSidebar conversationText={conversationText} generatedCards={generatedCards} onToggleStep={handleToggleStep} />
           )}
         </div>
 
@@ -479,6 +762,17 @@ export function AgentPage() {
           >
             <FiMessageCircle size={18} />
             Chat
+          </button>
+          <button
+            onClick={() => setMobileTab('history')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
+              mobileTab === 'history'
+                ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            <FiSidebar size={18} />
+            History
           </button>
           <button
             onClick={() => setMobileTab('studio')}
@@ -499,4 +793,3 @@ export function AgentPage() {
     </div>
   );
 }
-

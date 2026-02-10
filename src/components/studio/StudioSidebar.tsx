@@ -7,39 +7,18 @@ import {
   CATEGORY_LABELS,
   StudioCard as StudioCardType,
 } from './StudioData';
+import { StreamingStudioCard } from '../../types';
+import { GeneratedStudioCardComponent } from './GeneratedStudioCard';
 
 interface StudioSidebarProps {
-  conversationText?: string; // Combined text from conversation for contextual matching
+  conversationText?: string;
+  generatedCards?: StreamingStudioCard[];
+  onToggleStep?: (cardIndex: number, stepIndex: number) => void;
 }
 
-export function StudioSidebar({ conversationText = '' }: StudioSidebarProps) {
+export function StudioSidebar({ generatedCards = [], onToggleStep }: StudioSidebarProps) {
   const [selectedCard, setSelectedCard] = useState<StudioCardType | null>(null);
-
-  // Find contextually relevant cards based on conversation
-  const contextualCards = useMemo(() => {
-    if (!conversationText) return [];
-
-    const lowerText = conversationText.toLowerCase();
-    const matches: { card: StudioCardType; score: number }[] = [];
-
-    STUDIO_CARDS.forEach((card) => {
-      let score = 0;
-      card.keywords.forEach((keyword) => {
-        if (lowerText.includes(keyword.toLowerCase())) {
-          score += 1;
-        }
-      });
-      if (score > 0) {
-        matches.push({ card, score });
-      }
-    });
-
-    // Sort by score and return top 3
-    return matches
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
-      .map((m) => m.card);
-  }, [conversationText]);
+  const [selectedGeneratedCardIndex, setSelectedGeneratedCardIndex] = useState<number | null>(null);
 
   // Group cards by category
   const cardsByCategory = useMemo(() => {
@@ -52,6 +31,8 @@ export function StudioSidebar({ conversationText = '' }: StudioSidebarProps) {
     });
     return grouped;
   }, []);
+
+  const selectedGeneratedCard = selectedGeneratedCardIndex !== null ? generatedCards[selectedGeneratedCardIndex] : null;
 
   return (
     <>
@@ -66,26 +47,26 @@ export function StudioSidebar({ conversationText = '' }: StudioSidebarProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-          {/* Contextual Section */}
-          {contextualCards.length > 0 && (
+          {/* AI-Generated Contextual Section */}
+          {generatedCards.length > 0 && (
             <div>
               <h3 className="text-sm font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-4 flex items-center gap-2">
                 <FiZap size={14} />
                 Related to your chat
               </h3>
-              <div className="grid grid-cols-3 gap-3">
-                {contextualCards.map((card) => (
-                  <StudioCard
-                    key={card.id}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                {generatedCards.map((card, index) => (
+                  <GeneratedStudioCardComponent
+                    key={`generated-${index}-${card.title}`}
                     card={card}
-                    onClick={() => setSelectedCard(card)}
+                    onClick={() => setSelectedGeneratedCardIndex(index)}
                   />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Categories */}
+          {/* Static Categories */}
           {Object.entries(cardsByCategory).map(([category, cards]) => (
             <div key={category}>
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">
@@ -105,11 +86,20 @@ export function StudioSidebar({ conversationText = '' }: StudioSidebarProps) {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Static card modal */}
       {selectedCard && (
         <StudioModal
           card={selectedCard}
           onClose={() => setSelectedCard(null)}
+        />
+      )}
+
+      {/* Generated card modal */}
+      {selectedGeneratedCard && selectedGeneratedCardIndex !== null && (
+        <StudioModal
+          generatedCard={selectedGeneratedCard}
+          onClose={() => setSelectedGeneratedCardIndex(null)}
+          onToggleStep={onToggleStep ? (stepIndex: number) => onToggleStep(selectedGeneratedCardIndex, stepIndex) : undefined}
         />
       )}
     </>

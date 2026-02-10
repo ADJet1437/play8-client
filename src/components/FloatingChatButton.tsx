@@ -5,8 +5,8 @@ export function FloatingChatButton() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Hide on agent page
-  if (location.pathname === '/agent') {
+  // Hide on agent pages
+  if (location.pathname.startsWith('/agent')) {
     return null;
   }
 
