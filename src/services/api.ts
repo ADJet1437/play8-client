@@ -1,5 +1,17 @@
 import axios from 'axios';
-import { Booking, Conversation, ConversationDetail, DeleteResponse, Machine, PagedResponse, PlanItem, PlanItemCreate } from '../types';
+import {
+  Booking,
+  Conversation,
+  ConversationDetail,
+  DeleteResponse,
+  Machine,
+  PagedResponse,
+  PlanItem,
+  PlanItemCreate,
+  SavedTrainingSession,
+  TrainingPlanCard,
+  DrillCard
+} from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001/api/v1';
 
@@ -150,6 +162,32 @@ export const planApi = {
 
   remove: async (itemId: string): Promise<DeleteResponse> => {
     const response = await api.delete<DeleteResponse>(`/plan/items/${itemId}`);
+    return response.data;
+  },
+};
+
+// Saved Training Sessions API
+export const savedSessionApi = {
+  save: async (trainingPlan: TrainingPlanCard, drillCards: DrillCard[]): Promise<SavedTrainingSession> => {
+    const response = await api.post<SavedTrainingSession>('/saved-sessions', {
+      training_plan_data: trainingPlan,
+      drill_cards_data: drillCards,
+    });
+    return response.data;
+  },
+
+  list: async (): Promise<PagedResponse<SavedTrainingSession>> => {
+    const response = await api.get<PagedResponse<SavedTrainingSession>>('/saved-sessions');
+    return response.data;
+  },
+
+  get: async (id: string): Promise<SavedTrainingSession> => {
+    const response = await api.get<SavedTrainingSession>(`/saved-sessions/${id}`);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<DeleteResponse> => {
+    const response = await api.delete<DeleteResponse>(`/saved-sessions/${id}`);
     return response.data;
   },
 };

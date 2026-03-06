@@ -1,18 +1,26 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FiArrowUp, FiMessageCircle, FiBookOpen, FiMoreVertical, FiSidebar } from 'react-icons/fi';
+import { FiArrowUp, FiMessageCircle, FiSidebar } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { StudioSidebar } from './studio/StudioSidebar';
 import { ConversationSidebar } from './ConversationSidebar';
 import { cardProgressApi, conversationApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { Conversation, StreamingStudioCard } from '../types';
+import {
+  Conversation,
+  StreamingStudioCard,
+  TrainingPlanCard,
+  DrillCard,
+  isTrainingPlanCard,
+  isDrillCard,
+} from '../types';
+import TrainingPlanCardComponent from './studio/TrainingPlanCardComponent';
+import { DrillSequenceView } from './studio/DrillSequenceView';
+import CardCarousel from './studio/CardCarousel';
+import DrillCardComponent from './studio/DrillCardComponent';
+import CardLoadingIndicator from './studio/CardLoadingIndicator';
 
-// Constants for panel sizing
-const DEFAULT_CHAT_WIDTH = 33; // Chat takes 1/3 by default
-const MIN_CHAT_WIDTH = 20;
-const MAX_CHAT_WIDTH = 60;
+// No longer need panel sizing constants - chat takes full width
 
 interface LocationState {
   initialMessage?: string;
@@ -165,6 +173,16 @@ export function AgentPage() {
   // Generated studio cards state
   const [generatedCards, setGeneratedCards] = useState<StreamingStudioCard[]>([]);
 
+  // New card types state
+  const [trainingPlanCards, setTrainingPlanCards] = useState<TrainingPlanCard[]>([]);
+  const [drillCards, setDrillCards] = useState<DrillCard[]>([]);
+  const [activeDrillSequence, setActiveDrillSequence] = useState<DrillCard[] | null>(null);
+
+  // Tool loading state (track which message index has loading tools)
+  const [toolLoadingByMessage, setToolLoadingByMessage] = useState<Map<number, boolean>>(new Map());
+  const toolLoadingStartTime = useRef<Map<number, number>>(new Map());
+  const currentAssistantMessageIndex = useRef<number | null>(null);
+
   // Initialize messages with the initial message if provided
   const [messages, setMessages] = useState<Message[]>(() => {
     if (initialMessage?.trim()) {
@@ -175,19 +193,13 @@ export function AgentPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(() => !!initialMessage?.trim());
   const [isStreaming, setIsStreaming] = useState(false);
-  const [mobileTab, setMobileTab] = useState<'chat' | 'studio' | 'history'>('chat');
-  const [chatWidthPercent, setChatWidthPercent] = useState(DEFAULT_CHAT_WIDTH);
-  const [isDragging, setIsDragging] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'chat' | 'history'>('chat');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const hasProcessedInitialMessage = useRef(false);
   const loadedConversationRef = useRef<string | null>(null);
   /** When we navigate to /agent/:id from stream (new conversation), skip loading so we don't overwrite local messages */
   const conversationIdFromStreamRef = useRef<string | null>(null);
-
-  // Determine if chat is in compact mode (narrow width)
-  const isCompactChat = chatWidthPercent < 40;
 
   // Load conversations on mount
   useEffect(() => {
@@ -199,39 +211,7 @@ export function AgentPage() {
     });
   }, [isAuthenticated]);
 
-  // Handle panel resize
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-      setChatWidthPercent(Math.min(MAX_CHAT_WIDTH, Math.max(MIN_CHAT_WIDTH, newWidth)));
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
-  // Combine all message content for contextual matching in studio
-  const conversationText = useMemo(() => {
-    return messages.map((m) => m.content).join(' ');
-  }, [messages]);
+  // No longer need resize or conversation text for studio
 
   // Scroll to bottom - uses container scrollTop for smoother streaming
   const scrollToBottom = useCallback((instant = false) => {
@@ -267,29 +247,35 @@ export function AgentPage() {
     e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
   };
 
-  // Parse tool_use result JSON into StreamingStudioCard(s)
-  const parseToolResultCards = useCallback((result: string): StreamingStudioCard[] => {
-    try {
-      const cards = JSON.parse(result);
-      if (!Array.isArray(cards)) return [];
-      return cards.map((card: Record<string, unknown>) => {
-        const content = card.content as Record<string, unknown> | undefined;
-        return {
-          title: (card.title as string) || '',
-          description: (card.description as string) || '',
-          category: (card.category as StreamingStudioCard['category']) || 'training',
-          difficulty: content?.difficulty as StreamingStudioCard['difficulty'],
-          duration: content?.duration as string | undefined,
-          overview: (content?.overview as string) || '',
-          steps: (content?.steps as string[]) || [],
-          tips: (content?.tips as string[]) || [],
-          isStreaming: false,
-        };
-      });
-    } catch {
-      return [];
-    }
-  }, []);
+  // Parse tool_use result JSON into appropriate card type(s)
+  const parseToolResultCards = useCallback(
+    (
+      result: string,
+      toolName: string
+    ): {
+      legacyCards: StreamingStudioCard[];
+      trainingPlanCard: TrainingPlanCard | null;
+      drillCards: DrillCard[];
+    } => {
+      try {
+        const parsed = JSON.parse(result);
+
+        // Handle generate_training_session (returns both plan and drills)
+        if (toolName === 'generate_training_session' && parsed.plan && parsed.drills) {
+          return {
+            legacyCards: [],
+            trainingPlanCard: parsed.plan as TrainingPlanCard,
+            drillCards: parsed.drills as DrillCard[],
+          };
+        }
+
+        return { legacyCards: [], trainingPlanCard: null, drillCards: [] };
+      } catch {
+        return { legacyCards: [], trainingPlanCard: null, drillCards: [] };
+      }
+    },
+    []
+  );
 
   // Fetch response from API (does not add user message - assumes it's already in state)
   const fetchResponse = useCallback(async (messageContent: string, conversationHistory: Message[], convId: string | null) => {
@@ -321,7 +307,11 @@ export function AgentPage() {
       let toolArgsBuffer = '';
 
       // Add assistant message placeholder
-      setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+      setMessages((prev) => {
+        const newMessages = [...prev, { role: 'assistant', content: '' }];
+        currentAssistantMessageIndex.current = newMessages.length - 1;
+        return newMessages;
+      });
       setIsStreaming(true);
 
       if (reader) {
@@ -360,6 +350,27 @@ export function AgentPage() {
                   break;
 
                 case 'tool_use_start':
+                  console.log('🔧 Tool use start:', data);
+
+                  // Only show skeleton loading indicator for training session generation
+                  if (data.tool === 'generate_training_session') {
+                    const currentMsgIndex = currentAssistantMessageIndex.current;
+                    if (currentMsgIndex === null) {
+                      console.error('❌ No current assistant message index!');
+                      break;
+                    }
+                    console.log('📍 Setting loading for message index:', currentMsgIndex);
+
+                    // Record start time for minimum display duration
+                    toolLoadingStartTime.current.set(currentMsgIndex, Date.now());
+
+                    setToolLoadingByMessage((prev) => {
+                      const updated = new Map(prev);
+                      updated.set(currentMsgIndex, true);
+                      console.log('💾 Updated toolLoadingByMessage:', updated);
+                      return updated;
+                    });
+                  }
                   toolArgsBuffer = '';
                   break;
 
@@ -368,30 +379,169 @@ export function AgentPage() {
                   break;
 
                 case 'tool_use_end':
-                  if (data.result) {
-                    const newCards = parseToolResultCards(data.result);
-                    if (newCards.length > 0) {
-                      setGeneratedCards(prev => [...prev, ...newCards]);
-                    }
+                  if (data.result && data.tool) {
+                    const { legacyCards, trainingPlanCard, drillCards } = parseToolResultCards(
+                      data.result,
+                      data.tool
+                    );
+
+                    // Debug logging
+                    console.log('🎯 Tool:', data.tool);
+                    console.log('📋 Training Plan:', trainingPlanCard);
+                    console.log('🎾 Drill Cards:', drillCards);
+
+                    // Track which message generated these cards
+                    setMessages((currentMessages) => {
+                      const currentMessageIndex = currentAssistantMessageIndex.current;
+                      if (currentMessageIndex === null) {
+                        console.error('❌ No current assistant message index in tool_use_end!');
+                        return currentMessages;
+                      }
+
+                      if (legacyCards.length > 0) {
+                        const cardsWithIndex = legacyCards.map((card) => ({
+                          ...card,
+                          messageIndex: currentMessageIndex,
+                        }));
+                        setGeneratedCards((prev) => [...prev, ...cardsWithIndex]);
+                      }
+
+                      if (trainingPlanCard) {
+                        setTrainingPlanCards((prev) => {
+                          // Prevent duplicates by checking training_plan_id
+                          const exists = prev.some(
+                            (c) => c.training_plan_id === trainingPlanCard.training_plan_id
+                          );
+                          if (exists) return prev;
+                          return [
+                            ...prev,
+                            { ...trainingPlanCard, messageIndex: currentMessageIndex },
+                          ];
+                        });
+                      }
+
+                      if (drillCards.length > 0) {
+                        const drillsWithIndex = drillCards.map((card) => ({
+                          ...card,
+                          messageIndex: currentMessageIndex,
+                        }));
+                        setDrillCards((prev) => {
+                          // Prevent duplicates by checking training_plan_id + drill_number
+                          const newDrills = drillsWithIndex.filter(
+                            (newDrill) =>
+                              !prev.some(
+                                (existingDrill) =>
+                                  existingDrill.training_plan_id === newDrill.training_plan_id &&
+                                  existingDrill.drill_number === newDrill.drill_number
+                              )
+                          );
+                          return [...prev, ...newDrills];
+                        });
+                      }
+
+                      // Hide loading indicator with minimum display time (only for training session tool)
+                      if (data.tool === 'generate_training_session') {
+                        const startTime = toolLoadingStartTime.current.get(currentMessageIndex);
+                        const MIN_LOADING_TIME = 500; // milliseconds
+
+                        if (startTime) {
+                          const elapsed = Date.now() - startTime;
+                          const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsed);
+
+                          console.log(`⏱️ Elapsed: ${elapsed}ms, waiting ${remainingTime}ms more`);
+
+                          setTimeout(() => {
+                            setToolLoadingByMessage((prev) => {
+                              const updated = new Map(prev);
+                              updated.set(currentMessageIndex, false);
+                              console.log('✅ Hiding skeleton after delay');
+                              return updated;
+                            });
+                            toolLoadingStartTime.current.delete(currentMessageIndex);
+                          }, remainingTime);
+                        } else {
+                          // No start time recorded, hide immediately
+                          setToolLoadingByMessage((prev) => {
+                            const updated = new Map(prev);
+                            updated.set(currentMessageIndex, false);
+                            return updated;
+                          });
+                        }
+                      }
+
+                      return currentMessages; // Don't modify messages
+                    });
                   }
                   toolArgsBuffer = '';
                   break;
 
                 case 'card_saved':
                   // Update the most recently added cards with their content_block_id
-                  if (data.content_block_id && data.result) {
-                    const savedCards = parseToolResultCards(data.result);
-                    setGeneratedCards(prev => {
-                      const updated = [...prev];
-                      // Match by title to find the cards that were just added
-                      for (const sc of savedCards) {
-                        const idx = updated.findIndex(c => c.title === sc.title && !c.content_block_id);
-                        if (idx >= 0) {
-                          updated[idx] = { ...updated[idx], content_block_id: data.content_block_id };
+                  if (data.content_block_id && data.result && data.tool) {
+                    const { legacyCards, trainingPlanCard, drillCards } = parseToolResultCards(
+                      data.result,
+                      data.tool
+                    );
+
+                    // Update legacy cards
+                    if (legacyCards.length > 0) {
+                      setGeneratedCards((prev) => {
+                        const updated = [...prev];
+                        for (const sc of legacyCards) {
+                          const idx = updated.findIndex(
+                            (c) => c.title === sc.title && !c.content_block_id
+                          );
+                          if (idx >= 0) {
+                            updated[idx] = {
+                              ...updated[idx],
+                              content_block_id: data.content_block_id,
+                            };
+                          }
                         }
-                      }
-                      return updated;
-                    });
+                        return updated;
+                      });
+                    }
+
+                    // Update training plan card
+                    if (trainingPlanCard) {
+                      setTrainingPlanCards((prev) => {
+                        const updated = [...prev];
+                        const idx = updated.findIndex(
+                          (c) =>
+                            c.training_plan_id === trainingPlanCard.training_plan_id &&
+                            !c.content_block_id
+                        );
+                        if (idx >= 0) {
+                          updated[idx] = {
+                            ...updated[idx],
+                            content_block_id: data.content_block_id,
+                          };
+                        }
+                        return updated;
+                      });
+                    }
+
+                    // Update drill cards
+                    if (drillCards.length > 0) {
+                      setDrillCards((prev) => {
+                        const updated = [...prev];
+                        for (const drill of drillCards) {
+                          const idx = updated.findIndex(
+                            (c) =>
+                              c.training_plan_id === drill.training_plan_id &&
+                              c.drill_number === drill.drill_number &&
+                              !c.content_block_id
+                          );
+                          if (idx >= 0) {
+                            updated[idx] = {
+                              ...updated[idx],
+                              content_block_id: data.content_block_id,
+                            };
+                          }
+                        }
+                        return updated;
+                      });
+                    }
                   }
                   break;
 
@@ -434,6 +584,7 @@ export function AgentPage() {
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
+      currentAssistantMessageIndex.current = null;
     }
   }, [conversations, login, parseToolResultCards, navigate, urlConversationId]);
 
@@ -490,24 +641,53 @@ export function AgentPage() {
       setMessages(detail.messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })));
 
       // Restore cards from content_blocks with checked_steps
-      const restoredCards: StreamingStudioCard[] = [];
-      for (const msg of detail.messages) {
+      const restoredLegacyCards: StreamingStudioCard[] = [];
+      const restoredTrainingPlans: TrainingPlanCard[] = [];
+      const restoredDrills: DrillCard[] = [];
+
+      // Track message index as we iterate
+      detail.messages.forEach((msg, messageIndex) => {
         if (msg.content_blocks) {
           for (const block of msg.content_blocks) {
-            if (block.type === 'tool_use' && block.content) {
-              const cards = parseToolResultCards(block.content);
-              for (const card of cards) {
+            if (block.type === 'tool_use' && block.content && block.tool_name) {
+              const { legacyCards, trainingPlanCard, drillCards } = parseToolResultCards(
+                block.content,
+                block.tool_name
+              );
+
+              for (const card of legacyCards) {
                 card.content_block_id = block.id;
+                card.messageIndex = messageIndex;
                 if (block.checked_steps) {
                   card.checked_steps = block.checked_steps;
                 }
               }
-              restoredCards.push(...cards);
+              restoredLegacyCards.push(...legacyCards);
+
+              if (trainingPlanCard) {
+                restoredTrainingPlans.push({
+                  ...trainingPlanCard,
+                  content_block_id: block.id,
+                  messageIndex,
+                });
+              }
+
+              if (drillCards.length > 0) {
+                const withIds = drillCards.map((drill) => ({
+                  ...drill,
+                  content_block_id: block.id,
+                  messageIndex,
+                }));
+                restoredDrills.push(...withIds);
+              }
             }
           }
         }
-      }
-      setGeneratedCards(restoredCards);
+      });
+
+      setGeneratedCards(restoredLegacyCards);
+      setTrainingPlanCards(restoredTrainingPlans);
+      setDrillCards(restoredDrills);
       setMobileTab('chat');
     } catch {
       // Conversation may have been deleted — redirect to empty state
@@ -533,6 +713,8 @@ export function AgentPage() {
       conversationIdFromStreamRef.current = null;
       setMessages([]);
       setGeneratedCards([]);
+      setTrainingPlanCards([]);
+      setDrillCards([]);
       setInput('');
       setIsLoading(false);
       setIsStreaming(false);
@@ -626,24 +808,114 @@ export function AgentPage() {
           <div className="flex-1 flex flex-col justify-end">
             <div className={`w-full mx-auto space-y-4 ${compact ? 'px-3 py-4' : 'px-4 py-8 max-w-3xl space-y-6'}`}>
               {messages.map((message, index) => (
-                <div key={index} className={message.role === 'user' ? 'flex justify-end' : 'text-left'}>
-                  {message.role === 'user' ? (
-                    // User message - bubble style
-                    <div className={`bg-indigo-600 text-white rounded-2xl ${compact ? 'max-w-[90%] px-3 py-2' : 'max-w-[85%] px-4 py-3'}`}>
-                      <p className={`whitespace-pre-wrap text-left ${compact ? 'text-sm leading-6' : 'leading-7'}`}>
-                        {message.content}
-                      </p>
-                    </div>
-                  ) : (
-                    // Assistant message - clean text
-                    <div className="text-left text-gray-900 dark:text-gray-100">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={compact ? CompactMarkdownComponents : MarkdownComponents}
-                      >
-                        {message.content || ' '}
-                      </ReactMarkdown>
-                    </div>
+                <div key={index} className="space-y-4">
+                  <div className={message.role === 'user' ? 'flex justify-end' : 'text-left'}>
+                    {message.role === 'user' ? (
+                      // User message - bubble style
+                      <div className={`bg-indigo-600 text-white rounded-2xl ${compact ? 'max-w-[90%] px-3 py-2' : 'max-w-[85%] px-4 py-3'}`}>
+                        <p className={`whitespace-pre-wrap text-left ${compact ? 'text-sm leading-6' : 'leading-7'}`}>
+                          {message.content}
+                        </p>
+                      </div>
+                    ) : (
+                      // Assistant message - clean text
+                      <div className="text-left text-gray-900 dark:text-gray-100">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={compact ? CompactMarkdownComponents : MarkdownComponents}
+                        >
+                          {message.content || ' '}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Show cards in carousel after their respective assistant message */}
+                  {message.role === 'assistant' && (
+                    <>
+                      {/* Tool loading indicator */}
+                      {(() => {
+                        const isLoading = toolLoadingByMessage.get(index);
+                        console.log(`🎨 Render check for message ${index}: isLoading=${isLoading}, map=`, toolLoadingByMessage);
+                        return isLoading && <CardLoadingIndicator message="Creating your training cards..." />;
+                      })()}
+
+                      {/* Training plan + drill cards carousel (only show when NOT loading) */}
+                      {!toolLoadingByMessage.get(index) && trainingPlanCards.filter((card) => card.messageIndex === index).length > 0 && (
+                        <div>
+                          {trainingPlanCards
+                            .filter((card) => card.messageIndex === index)
+                            .map((card) => {
+                              const relatedDrills = drillCards
+                                .filter(
+                                  (drill) =>
+                                    drill.training_plan_id === card.training_plan_id &&
+                                    drill.messageIndex === index
+                                )
+                                .sort((a, b) => a.drill_number - b.drill_number);
+
+                              // Build carousel children: training card + drill cards
+                              const carouselChildren = [
+                                <TrainingPlanCardComponent
+                                  key="training-card"
+                                  card={card}
+                                  drillCards={relatedDrills}
+                                  onStartTraining={
+                                    relatedDrills.length > 0
+                                      ? () => setActiveDrillSequence(relatedDrills)
+                                      : undefined
+                                  }
+                                />,
+                                ...relatedDrills.map((drill, idx) => (
+                                  <DrillCardComponent
+                                    key={drill.drill_number}
+                                    card={drill}
+                                    onNext={
+                                      idx < relatedDrills.length - 1
+                                        ? () => {
+                                            // Carousel will handle navigation
+                                          }
+                                        : undefined
+                                    }
+                                    onPrevious={
+                                      idx > 0
+                                        ? () => {
+                                            // Carousel will handle navigation
+                                          }
+                                        : undefined
+                                    }
+                                    currentDrill={drill.drill_number}
+                                    totalDrills={relatedDrills.length}
+                                  />
+                                )),
+                              ];
+
+                              return (
+                                <CardCarousel key={card.training_plan_id}>
+                                  {carouselChildren}
+                                </CardCarousel>
+                              );
+                            })}
+                        </div>
+                      )}
+
+                      {/* Legacy cards for this message */}
+                      {generatedCards.filter((card) => card.messageIndex === index).length > 0 && (
+                        <div className="space-y-4">
+                          {generatedCards
+                            .filter((card) => card.messageIndex === index)
+                            .map((card, cardIndex) => (
+                              <div
+                                key={`legacy-${cardIndex}`}
+                                className="p-4 bg-gray-50 rounded-lg"
+                              >
+                                <h3 className="font-semibold">{card.title}</h3>
+                                <p className="text-sm text-gray-600">{card.description}</p>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ))}
@@ -690,11 +962,8 @@ export function AgentPage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      {/* Desktop Layout - Resizable Panels */}
-      <div
-        ref={containerRef}
-        className="hidden md:flex flex-1 min-h-0 overflow-hidden"
-      >
+      {/* Desktop Layout */}
+      <div className="hidden md:flex flex-1 min-h-0 overflow-hidden">
         {/* Conversation Sidebar */}
         {sidebarOpen && (
           <div className="w-56 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
@@ -708,11 +977,8 @@ export function AgentPage() {
           </div>
         )}
 
-        {/* Chat Area */}
-        <div
-          className="min-w-0 overflow-hidden flex flex-col"
-          style={{ width: `${chatWidthPercent}%` }}
-        >
+        {/* Chat Area - Now takes full width */}
+        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
           {/* Sidebar toggle */}
           <div className="flex-shrink-0 flex items-center px-2 py-1 border-b border-gray-100 dark:border-gray-800">
             <button
@@ -724,23 +990,8 @@ export function AgentPage() {
             </button>
           </div>
           <div className="flex-1 min-h-0">
-            {renderChatContent(isCompactChat)}
+            {renderChatContent(false)}
           </div>
-        </div>
-
-        {/* Resize Handle */}
-        <div
-          className={`w-1 flex-shrink-0 bg-gray-200 dark:bg-gray-700 hover:bg-indigo-400 dark:hover:bg-indigo-500 transition-colors cursor-col-resize flex items-center justify-center group ${isDragging ? 'bg-indigo-500' : ''}`}
-          onMouseDown={handleMouseDown}
-        >
-          <div className="w-4 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <FiMoreVertical size={12} className="text-white" />
-          </div>
-        </div>
-
-        {/* Studio Area - Takes remaining space */}
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <StudioSidebar conversationText={conversationText} generatedCards={generatedCards} onToggleStep={handleToggleStep} />
         </div>
       </div>
 
@@ -750,7 +1001,7 @@ export function AgentPage() {
         <div className="flex-1 min-h-0 overflow-hidden">
           {mobileTab === 'chat' ? (
             renderChatContent(false)
-          ) : mobileTab === 'history' ? (
+          ) : (
             <ConversationSidebar
               conversations={conversations}
               currentConversationId={urlConversationId ?? null}
@@ -758,12 +1009,10 @@ export function AgentPage() {
               onNewChat={handleNewChat}
               onDeleteConversation={handleDeleteConversation}
             />
-          ) : (
-            <StudioSidebar conversationText={conversationText} generatedCards={generatedCards} onToggleStep={handleToggleStep} />
           )}
         </div>
 
-        {/* Mobile Tab Bar */}
+        {/* Mobile Tab Bar - Only Chat and History */}
         <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <button
             onClick={() => setMobileTab('chat')}
@@ -787,22 +1036,16 @@ export function AgentPage() {
             <FiSidebar size={18} />
             History
           </button>
-          <button
-            onClick={() => setMobileTab('studio')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-              mobileTab === 'studio'
-                ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
-                : 'text-gray-500 dark:text-gray-400'
-            }`}
-          >
-            <FiBookOpen size={18} />
-            Studio
-          </button>
         </div>
       </div>
 
-      {/* Overlay to prevent text selection during drag */}
-      {isDragging && <div className="fixed inset-0 z-50 cursor-col-resize" />}
+      {/* Drill Sequence Full-Screen View */}
+      {activeDrillSequence && (
+        <DrillSequenceView
+          drills={activeDrillSequence}
+          onClose={() => setActiveDrillSequence(null)}
+        />
+      )}
     </div>
   );
 }
