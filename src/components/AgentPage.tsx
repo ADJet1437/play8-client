@@ -4,7 +4,7 @@ import { FiArrowUp, FiMessageCircle, FiSidebar } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ConversationSidebar } from './ConversationSidebar';
-import { cardProgressApi, conversationApi } from '../services/api';
+import { conversationApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Conversation,
