@@ -65,10 +65,10 @@ export function ConversationSidebar({
         ) : (
           <div className="py-1">
             {conversations.map((conv) => (
-              <button
+              <div
                 key={conv.id}
                 onClick={() => onSelectConversation(conv.id)}
-                className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm group transition-colors ${
+                className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm group transition-colors cursor-pointer ${
                   currentConversationId === conv.id
                     ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -94,7 +94,7 @@ export function ConversationSidebar({
                 >
                   <FiTrash2 size={14} />
                 </button>
-              </button>
+              </div>
             ))}
           </div>
         )}

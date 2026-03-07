@@ -2,22 +2,24 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
-import { PlanBoard } from './plan/PlanBoard';
-import { planApi } from '../services/api';
-import { PlanItem } from '../types';
+import { SavedSessionsList } from './plan/SavedSessionsList';
+import { DrillSequenceView } from './studio/DrillSequenceView';
+import { savedSessionApi } from '../services/api';
+import { SavedTrainingSession, DrillCard } from '../types';
 
 export function ProfilePage() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [items, setItems] = useState<PlanItem[]>([]);
+  const [sessions, setSessions] = useState<SavedTrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeDrillSequence, setActiveDrillSequence] = useState<DrillCard[] | null>(null);
 
-  const fetchPlan = useCallback(async () => {
+  const fetchSessions = useCallback(async () => {
     try {
-      const data = await planApi.list();
-      setItems(data);
+      const response = await savedSessionApi.list();
+      setSessions(response.data);
     } catch (error) {
-      console.error('Failed to fetch plan:', error);
+      console.error('Failed to fetch saved sessions:', error);
     } finally {
       setLoading(false);
     }
@@ -25,48 +27,25 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchPlan();
+      fetchSessions();
     }
-  }, [isAuthenticated, fetchPlan]);
+  }, [isAuthenticated, fetchSessions]);
 
-  const handleToggleStep = async (itemId: string, stepIndex: number) => {
+  const handleDelete = async (sessionId: string) => {
     // Optimistic update
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== itemId) return item;
-        const newChecked = [...item.checked_steps];
-        newChecked[stepIndex] = !newChecked[stepIndex];
-        const allChecked = newChecked.length > 0 && newChecked.every(Boolean);
-        const anyChecked = newChecked.some(Boolean);
-        const status = allChecked ? 'complete' : anyChecked ? 'in_progress' : 'todo';
-        return { ...item, checked_steps: newChecked, status } as PlanItem;
-      })
-    );
+    setSessions((prev) => prev.filter((session) => session.id !== sessionId));
 
-    // Persist
-    const item = items.find((i) => i.id === itemId);
-    if (item) {
-      const newChecked = [...item.checked_steps];
-      newChecked[stepIndex] = !newChecked[stepIndex];
-      try {
-        await planApi.updateProgress(itemId, newChecked);
-      } catch (error) {
-        console.error('Failed to update progress:', error);
-        fetchPlan(); // Revert on error
-      }
+    try {
+      await savedSessionApi.delete(sessionId);
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+      fetchSessions(); // Revert on error
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    // Optimistic update
-    setItems((prev) => prev.filter((item) => item.id !== itemId));
-
-    try {
-      await planApi.remove(itemId);
-    } catch (error) {
-      console.error('Failed to delete plan item:', error);
-      fetchPlan(); // Revert on error
-    }
+  const handleStartTraining = (session: SavedTrainingSession) => {
+    // Set the drill sequence to activate full-screen training mode
+    setActiveDrillSequence(session.drill_cards_data);
   };
 
   if (!isAuthenticated || !user) {
@@ -107,36 +86,38 @@ export function ProfilePage() {
         </div>
       </div>
 
-      {/* Training Plan */}
+      {/* Saved Training Sessions */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-          My Training Plan
+          My Saved Training Sessions
         </h2>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="space-y-3">
-                <div className="h-6 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse w-24" />
-                <div className="h-24 bg-gray-100 dark:bg-gray-700/50 rounded animate-pulse" />
+              <div key={i} className="space-y-3 p-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg animate-pulse">
+                <div className="h-6 bg-gray-200 dark:bg-gray-600/50 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-600/50 rounded w-1/2" />
+                <div className="h-10 bg-gray-200 dark:bg-gray-600/50 rounded w-full" />
               </div>
             ))}
           </div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-700/40">
-            <p className="text-gray-500 dark:text-gray-400 mb-1">No cards in your plan yet.</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500">
-              Open a training card and click "Add to plan" to get started.
-            </p>
-          </div>
         ) : (
-          <PlanBoard
-            items={items}
-            onToggleStep={handleToggleStep}
+          <SavedSessionsList
+            sessions={sessions}
             onDelete={handleDelete}
+            onStartTraining={handleStartTraining}
           />
         )}
       </div>
+
+      {/* Full-screen drill sequence view */}
+      {activeDrillSequence && (
+        <DrillSequenceView
+          drills={activeDrillSequence}
+          onClose={() => setActiveDrillSequence(null)}
+        />
+      )}
     </div>
   );
 }
