@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FiArrowUp, FiMessageCircle, FiSidebar } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
@@ -11,8 +11,6 @@ import {
   StreamingStudioCard,
   TrainingPlanCard,
   DrillCard,
-  isTrainingPlanCard,
-  isDrillCard,
 } from '../types';
 import TrainingPlanCardComponent from './studio/TrainingPlanCardComponent';
 import { DrillSequenceView } from './studio/DrillSequenceView';
@@ -308,7 +306,7 @@ export function AgentPage() {
 
       // Add assistant message placeholder
       setMessages((prev) => {
-        const newMessages = [...prev, { role: 'assistant', content: '' }];
+        const newMessages = [...prev, { role: 'assistant' as const, content: '' }];
         currentAssistantMessageIndex.current = newMessages.length - 1;
         return newMessages;
       });
@@ -743,28 +741,6 @@ export function AgentPage() {
       // Silently fail
     }
   };
-
-  // Toggle a step checkbox on a generated card
-  const handleToggleStep = useCallback(async (cardIndex: number, stepIndex: number) => {
-    setGeneratedCards(prev => {
-      const updated = [...prev];
-      const card = updated[cardIndex];
-      if (!card) return prev;
-      const steps = card.checked_steps ?? new Array(card.steps.length).fill(false);
-      const newSteps = [...steps];
-      newSteps[stepIndex] = !newSteps[stepIndex];
-      updated[cardIndex] = { ...card, checked_steps: newSteps };
-
-      // Persist in background
-      if (card.content_block_id) {
-        cardProgressApi.update(card.content_block_id, newSteps).catch(() => {
-          // Silently fail — optimistic update already applied
-        });
-      }
-
-      return updated;
-    });
-  }, []);
 
   // Auth gate
   if (!isAuthenticated) {

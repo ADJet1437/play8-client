@@ -10,7 +10,6 @@ interface DrillSequenceViewProps {
 export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentDrill = drills[currentIndex];
-  const containerRef = useRef<HTMLDivElement>(null);
 
   // Set up keyboard navigation
   useEffect(() => {
