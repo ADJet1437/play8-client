@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiTrash2, FiEye, FiPlay, FiChevronDown, FiChevronUp, FiClock } from 'react-icons/fi';
+import { FiTrash2, FiEye, FiPlay, FiChevronUp, FiClock } from 'react-icons/fi';
 import { SavedTrainingSession } from '../../types';
 
 interface SavedSessionsListProps {

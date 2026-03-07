@@ -43,7 +43,7 @@ export default function DrillCardCompact({ card, totalDrills }: DrillCardCompact
                 Spin
               </div>
               <div className="text-xs font-medium text-gray-900 truncate">
-                {card.parameters.spin}
+                {card.parameters?.spin}
               </div>
             </div>
 
@@ -52,7 +52,7 @@ export default function DrillCardCompact({ card, totalDrills }: DrillCardCompact
                 Speed
               </div>
               <div className="text-xs font-medium text-gray-900 truncate">
-                {card.parameters.speed}
+                {card.parameters?.speed}
               </div>
             </div>
 
@@ -61,7 +61,7 @@ export default function DrillCardCompact({ card, totalDrills }: DrillCardCompact
                 Height
               </div>
               <div className="text-xs font-medium text-gray-900 truncate">
-                {card.parameters.height}
+                {card.parameters?.height}
               </div>
             </div>
 
@@ -70,7 +70,7 @@ export default function DrillCardCompact({ card, totalDrills }: DrillCardCompact
                 Distance
               </div>
               <div className="text-xs font-medium text-gray-900 truncate">
-                {card.parameters.distance}
+                {card.parameters?.distance}
               </div>
             </div>
 
@@ -79,7 +79,7 @@ export default function DrillCardCompact({ card, totalDrills }: DrillCardCompact
                 Location
               </div>
               <div className="text-xs font-medium text-gray-900 truncate">
-                {card.parameters.location}
+                {card.parameters?.location}
               </div>
             </div>
 
@@ -88,7 +88,7 @@ export default function DrillCardCompact({ card, totalDrills }: DrillCardCompact
                 Reps
               </div>
               <div className="text-xs font-medium text-gray-900">
-                {card.parameters.repetitions} balls
+                {card.parameters?.repetitions} balls
               </div>
             </div>
           </div>
