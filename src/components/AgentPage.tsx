@@ -624,13 +624,27 @@ export function AgentPage() {
     fetchResponse(trimmed, messages, urlConversationId ?? null);
   };
 
-  // Handle initial message from navigation - user message already in state via useState initializer
+  // Ensure initial message is in messages array (useState initializer only runs once)
+  useEffect(() => {
+    if (initialMessage?.trim() && !hasProcessedInitialMessage.current) {
+      setMessages((prev) => {
+        // Check if already exists
+        const exists = prev.some(m => m.role === 'user' && m.content === initialMessage.trim());
+        if (exists) {
+          return prev;
+        }
+        return [{ role: 'user', content: initialMessage.trim() }];
+      });
+    }
+  }, [initialMessage]);
+
+  // Handle initial message from navigation - fetch response
   useEffect(() => {
     if (initialMessage?.trim() && !hasProcessedInitialMessage.current && isAuthenticated) {
       hasProcessedInitialMessage.current = true;
       // Clear location state so refresh doesn't re-trigger
       navigate(location.pathname, { replace: true, state: {} });
-      // Fetch response immediately - user message is already displayed
+      // Fetch response
       fetchResponse(initialMessage.trim(), [], null);
     }
   }, [initialMessage, fetchResponse, isAuthenticated, navigate, location.pathname]);
@@ -760,8 +774,9 @@ export function AgentPage() {
         return;
       }
       loadConversation(urlConversationId);
-    } else {
+    } else if (!initialMessage && !isStreaming && !isLoading) {
       // Empty state: clear everything
+      // Only clear if no initial message AND not currently streaming/loading
       loadedConversationRef.current = null;
       conversationIdFromStreamRef.current = null;
       setMessages([]);
@@ -772,7 +787,7 @@ export function AgentPage() {
       setIsLoading(false);
       setIsStreaming(false);
     }
-  }, [urlConversationId, isAuthenticated, loadConversation]);
+  }, [urlConversationId, isAuthenticated, loadConversation, initialMessage, isStreaming, isLoading]);
 
   // Conversation sidebar handlers
   const handleSelectConversation = (id: string) => {
