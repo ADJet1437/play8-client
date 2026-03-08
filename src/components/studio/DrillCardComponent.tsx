@@ -1,4 +1,5 @@
 import { DrillCard } from '../../types';
+import { CourtDiagram } from './CourtDiagram';
 
 interface DrillCardComponentProps {
   card: DrillCard;
@@ -21,35 +22,52 @@ export default function DrillCardComponent({
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto h-[750px] flex flex-col">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
-        <div className="flex justify-between items-start mb-2">
+      {/* Header - Compact with Focus Points */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
+        <div className="flex justify-between items-start mb-1">
           <div className="flex-1">
-            <div className="text-sm font-medium opacity-90 mb-1">
+            <div className="text-xs font-medium opacity-90 mb-0.5">
               Drill {card.drill_number}
               {currentDrill && totalDrills && (
-                <span className="ml-2">
+                <span className="ml-1.5">
                   ({currentDrill}/{totalDrills})
                 </span>
               )}
             </div>
-            <h2 className="text-2xl font-bold">{card.title}</h2>
+            <h2 className="text-lg font-bold">{card.title}</h2>
           </div>
-          <div className="bg-white/20 rounded-lg px-3 py-1 text-sm font-medium">
+          <div className="bg-white/20 rounded-lg px-2.5 py-0.5 text-xs font-medium">
             {card.duration}
           </div>
         </div>
-        <p className="text-blue-100 text-sm">{card.description}</p>
-        {card.machine_position && (
-          <div className="mt-2 text-xs text-blue-200">
-            📍 Machine Position: {card.machine_position}
+        <p className="text-blue-100 text-xs line-clamp-1 mb-1.5">{card.description}</p>
+
+        {/* Focus Points - Vertical with checkmarks */}
+        {card.focus_points.length > 0 && (
+          <div className="space-y-0.5 mt-1.5">
+            {card.focus_points.map((point, index) => (
+              <div key={index} className="flex items-start gap-1.5">
+                <svg
+                  className="w-3 h-3 text-green-300 mt-0.5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-xs text-blue-50">{point}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {/* PongBot Settings */}
-      <div className="p-6 flex-1">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <div className="p-4 flex-1">
+        <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
           <svg
             className="w-5 h-5 mr-2 text-blue-600"
             fill="none"
@@ -77,48 +95,95 @@ export default function DrillCardComponent({
           )}
         </h3>
 
-        {/* New Format: Ball Sequence */}
+        {/* Court Diagram - Visual representation */}
         {hasNewFormat && (
-          <div className="space-y-4">
-            {card.ball_sequence!.map((ball) => (
-              <div key={ball.ball_number} className="border border-gray-200 rounded-lg overflow-hidden">
-                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                  <span className="font-semibold text-gray-900">Ball {ball.ball_number}</span>
-                </div>
-                <div className="p-4">
-                  <table className="min-w-full text-sm">
-                    <tbody className="divide-y divide-gray-100">
-                      <tr>
-                        <td className="py-1.5 pr-4 font-medium text-gray-700 w-32">Spin Type</td>
-                        <td className="py-1.5 text-gray-900">{ball.spin_type}</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 pr-4 font-medium text-gray-700">Spin Strength</td>
-                        <td className="py-1.5 text-gray-900">{ball.spin_strength}/10</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 pr-4 font-medium text-gray-700">Speed</td>
-                        <td className="py-1.5 text-gray-900">{ball.speed}/10</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 pr-4 font-medium text-gray-700">Drop Point</td>
-                        <td className="py-1.5 text-gray-900">
-                          {ball.drop_point} {ball.drop_point < 0 ? '(Left)' : ball.drop_point > 0 ? '(Right)' : '(Center)'}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 pr-4 font-medium text-gray-700">Depth</td>
-                        <td className="py-1.5 text-gray-900">{ball.depth}/20</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 pr-4 font-medium text-gray-700">Feed Interval</td>
-                        <td className="py-1.5 text-gray-900">{ball.feed}s</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
+          <div className="mb-3 bg-gray-50 rounded-lg p-2">
+            <CourtDiagram
+              machinePosition={card.machine_position}
+              ballSequence={card.ball_sequence}
+            />
+          </div>
+        )}
+
+        {/* New Format: Ball Sequence - Horizontal Table (6 balls) */}
+        {hasNewFormat && (
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-200 rounded-md text-xs">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-2 py-1.5 text-left font-semibold text-gray-700 border-b border-r border-gray-200 sticky left-0 bg-gray-50">
+                    Parameter
+                  </th>
+                  {card.ball_sequence!.map((ball) => (
+                    <th key={ball.ball_number} className="px-2 py-1.5 text-center font-semibold text-gray-900 border-b border-gray-200 min-w-[70px]">
+                      Ball {ball.ball_number}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr>
+                  <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
+                    Spin Type
+                  </td>
+                  {card.ball_sequence!.map((ball) => (
+                    <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
+                      {ball.spin_type}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
+                    Spin Strength
+                  </td>
+                  {card.ball_sequence!.map((ball) => (
+                    <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
+                      {ball.spin_strength}/10
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
+                    Speed
+                  </td>
+                  {card.ball_sequence!.map((ball) => (
+                    <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
+                      {ball.speed}/10
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
+                    Drop Point
+                  </td>
+                  {card.ball_sequence!.map((ball) => (
+                    <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
+                      {ball.drop_point}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
+                    Depth
+                  </td>
+                  {card.ball_sequence!.map((ball) => (
+                    <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
+                      {ball.depth}/20
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
+                    Feed (s)
+                  </td>
+                  {card.ball_sequence!.map((ball) => (
+                    <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
+                      {ball.feed}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
           </div>
         )}
 
@@ -191,28 +256,6 @@ export default function DrillCardComponent({
         )}
       </div>
 
-      {/* Focus Points */}
-      <div className="px-6 pb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Focus Points</h3>
-        <ul className="space-y-2">
-          {card.focus_points.map((point, index) => (
-            <li key={index} className="flex items-start">
-              <svg
-                className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-gray-700">{point}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
 
       {/* Navigation Buttons */}
       <div className="px-6 pb-6 flex gap-3">
