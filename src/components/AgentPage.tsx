@@ -24,9 +24,19 @@ interface LocationState {
   initialMessage?: string;
 }
 
+interface ContentBlock {
+  type: 'text' | 'tool_use';
+  text?: string;
+  cards?: {
+    trainingPlan?: TrainingPlanCard;
+    drills: DrillCard[];
+  };
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  blocks?: ContentBlock[]; // Maintains chronological order of text and cards
 }
 
 // Compact markdown components for narrow chat panel
@@ -304,9 +314,9 @@ export function AgentPage() {
       let assistantMessage = '';
       let toolArgsBuffer = '';
 
-      // Add assistant message placeholder
+      // Add assistant message placeholder with blocks
       setMessages((prev) => {
-        const newMessages = [...prev, { role: 'assistant' as const, content: '' }];
+        const newMessages = [...prev, { role: 'assistant' as const, content: '', blocks: [] }];
         currentAssistantMessageIndex.current = newMessages.length - 1;
         return newMessages;
       });
@@ -339,9 +349,29 @@ export function AgentPage() {
                   assistantMessage += data.content;
                   setMessages((prev) => {
                     const newMessages = [...prev];
+                    const lastMessage = newMessages[newMessages.length - 1];
+                    const prevBlocks = lastMessage.blocks || [];
+
+                    // Create new blocks array with proper cloning
+                    let newBlocks: ContentBlock[];
+                    if (prevBlocks.length > 0 && prevBlocks[prevBlocks.length - 1].type === 'text') {
+                      // Clone all blocks and append to last text block
+                      newBlocks = [
+                        ...prevBlocks.slice(0, -1),
+                        {
+                          ...prevBlocks[prevBlocks.length - 1],
+                          text: (prevBlocks[prevBlocks.length - 1].text || '') + data.content,
+                        },
+                      ];
+                    } else {
+                      // Add new text block
+                      newBlocks = [...prevBlocks, { type: 'text', text: data.content }];
+                    }
+
                     newMessages[newMessages.length - 1] = {
                       role: 'assistant',
                       content: assistantMessage,
+                      blocks: newBlocks,
                     };
                     return newMessages;
                   });
@@ -378,7 +408,7 @@ export function AgentPage() {
 
                 case 'tool_use_end':
                   if (data.result && data.tool) {
-                    const { legacyCards, trainingPlanCard, drillCards } = parseToolResultCards(
+                    const { trainingPlanCard, drillCards } = parseToolResultCards(
                       data.result,
                       data.tool
                     );
@@ -396,45 +426,27 @@ export function AgentPage() {
                         return currentMessages;
                       }
 
-                      if (legacyCards.length > 0) {
-                        const cardsWithIndex = legacyCards.map((card) => ({
-                          ...card,
-                          messageIndex: currentMessageIndex,
-                        }));
-                        setGeneratedCards((prev) => [...prev, ...cardsWithIndex]);
-                      }
+                      // Add tool_use block to maintain chronological order
+                      const updatedMessages = [...currentMessages];
+                      const message = updatedMessages[currentMessageIndex];
+                      const prevBlocks = message.blocks || [];
 
-                      if (trainingPlanCard) {
-                        setTrainingPlanCards((prev) => {
-                          // Prevent duplicates by checking training_plan_id
-                          const exists = prev.some(
-                            (c) => c.training_plan_id === trainingPlanCard.training_plan_id
-                          );
-                          if (exists) return prev;
-                          return [
-                            ...prev,
-                            { ...trainingPlanCard, messageIndex: currentMessageIndex },
-                          ];
-                        });
-                      }
-
-                      if (drillCards.length > 0) {
-                        const drillsWithIndex = drillCards.map((card) => ({
-                          ...card,
-                          messageIndex: currentMessageIndex,
-                        }));
-                        setDrillCards((prev) => {
-                          // Prevent duplicates by checking training_plan_id + drill_number
-                          const newDrills = drillsWithIndex.filter(
-                            (newDrill) =>
-                              !prev.some(
-                                (existingDrill) =>
-                                  existingDrill.training_plan_id === newDrill.training_plan_id &&
-                                  existingDrill.drill_number === newDrill.drill_number
-                              )
-                          );
-                          return [...prev, ...newDrills];
-                        });
+                      // Add cards as a tool_use block (create new array, don't mutate)
+                      if (trainingPlanCard || drillCards.length > 0) {
+                        const newBlocks = [
+                          ...prevBlocks,
+                          {
+                            type: 'tool_use' as const,
+                            cards: {
+                              trainingPlan: trainingPlanCard || undefined,
+                              drills: drillCards,
+                            },
+                          },
+                        ];
+                        updatedMessages[currentMessageIndex] = {
+                          ...message,
+                          blocks: newBlocks,
+                        };
                       }
 
                       // Hide loading indicator with minimum display time (only for training session tool)
@@ -467,7 +479,7 @@ export function AgentPage() {
                         }
                       }
 
-                      return currentMessages; // Don't modify messages
+                      return updatedMessages;
                     });
                   }
                   toolArgsBuffer = '';
@@ -636,9 +648,52 @@ export function AgentPage() {
     loadedConversationRef.current = id;
     try {
       const detail = await conversationApi.get(id);
-      setMessages(detail.messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })));
 
-      // Restore cards from content_blocks with checked_steps
+      // Build messages with blocks structure from content_blocks
+      const messagesWithBlocks = detail.messages.map((msg) => {
+        if (msg.role === 'user') {
+          return { role: 'user' as const, content: msg.content };
+        }
+
+        // For assistant messages, reconstruct blocks from content_blocks
+        const blocks: ContentBlock[] = [];
+
+        if (msg.content_blocks && msg.content_blocks.length > 0) {
+          // Build blocks from content_blocks
+          for (const block of msg.content_blocks) {
+            if (block.type === 'text' && block.content) {
+              blocks.push({ type: 'text', text: block.content });
+            } else if (block.type === 'tool_use' && block.content && block.tool_name) {
+              const { trainingPlanCard, drillCards } = parseToolResultCards(
+                block.content,
+                block.tool_name
+              );
+              if (trainingPlanCard || drillCards.length > 0) {
+                blocks.push({
+                  type: 'tool_use',
+                  cards: {
+                    trainingPlan: trainingPlanCard || undefined,
+                    drills: drillCards,
+                  },
+                });
+              }
+            }
+          }
+        } else if (msg.content) {
+          // Fallback: if no content_blocks but has content, create a single text block
+          blocks.push({ type: 'text', text: msg.content });
+        }
+
+        return {
+          role: 'assistant' as const,
+          content: msg.content,
+          blocks: blocks.length > 0 ? blocks : undefined,
+        };
+      });
+
+      setMessages(messagesWithBlocks);
+
+      // Restore cards from content_blocks with checked_steps (for legacy rendering)
       const restoredLegacyCards: StreamingStudioCard[] = [];
       const restoredTrainingPlans: TrainingPlanCard[] = [];
       const restoredDrills: DrillCard[] = [];
@@ -794,30 +849,74 @@ export function AgentPage() {
                         </p>
                       </div>
                     ) : (
-                      // Assistant message - clean text
-                      <div className="text-left text-gray-900 dark:text-gray-100">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={compact ? CompactMarkdownComponents : MarkdownComponents}
-                        >
-                          {message.content || ' '}
-                        </ReactMarkdown>
+                      // Assistant message - render blocks in chronological order
+                      <div className="text-left text-gray-900 dark:text-gray-100 space-y-4">
+                        {message.blocks?.map((block, blockIndex) => (
+                          <div key={blockIndex}>
+                            {block.type === 'text' && block.text && (
+                              <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={compact ? CompactMarkdownComponents : MarkdownComponents}
+                              >
+                                {block.text}
+                              </ReactMarkdown>
+                            )}
+                            {block.type === 'tool_use' && block.cards && (
+                              <>
+                                {/* Cards carousel (only show when NOT loading) */}
+                                {!toolLoadingByMessage.get(index) && block.cards.trainingPlan && (
+                                  <div>
+                                    {(() => {
+                                      const card = block.cards.trainingPlan!;
+                                      const relatedDrills = block.cards.drills.sort(
+                                        (a, b) => a.drill_number - b.drill_number
+                                      );
+
+                                      const carouselChildren = [
+                                        <TrainingPlanCardComponent
+                                          key="training-card"
+                                          card={card}
+                                          drillCards={relatedDrills}
+                                          onStartTraining={
+                                            relatedDrills.length > 0
+                                              ? () => setActiveDrillSequence(relatedDrills)
+                                              : undefined
+                                          }
+                                        />,
+                                        ...relatedDrills.map((drill) => (
+                                          <DrillCardComponent
+                                            key={drill.drill_number}
+                                            card={drill}
+                                            onNext={() => {}}
+                                            onPrevious={() => {}}
+                                            currentDrill={drill.drill_number}
+                                            totalDrills={relatedDrills.length}
+                                          />
+                                        )),
+                                      ];
+
+                                      return <CardCarousel>{carouselChildren}</CardCarousel>;
+                                    })()}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        ))}
+
+                        {/* Show skeleton loading indicator after all blocks while loading */}
+                        {toolLoadingByMessage.get(index) && (
+                          <CardLoadingIndicator message="Creating your training cards..." />
+                        )}
                       </div>
                     )}
                   </div>
 
-                  {/* Show cards in carousel after their respective assistant message */}
-                  {message.role === 'assistant' && (
+                  {/* Legacy cards rendering - can be removed after migration */}
+                  {message.role === 'assistant' && !message.blocks && trainingPlanCards.filter((card) => card.messageIndex === index).length > 0 && (
                     <>
-                      {/* Tool loading indicator */}
-                      {(() => {
-                        const isLoading = toolLoadingByMessage.get(index);
-                        console.log(`🎨 Render check for message ${index}: isLoading=${isLoading}, map=`, toolLoadingByMessage);
-                        return isLoading && <CardLoadingIndicator message="Creating your training cards..." />;
-                      })()}
-
-                      {/* Training plan + drill cards carousel (only show when NOT loading) */}
-                      {!toolLoadingByMessage.get(index) && trainingPlanCards.filter((card) => card.messageIndex === index).length > 0 && (
+                      {/* Training plan + drill cards carousel */}
+                      {!toolLoadingByMessage.get(index) && (
                         <div>
                           {trainingPlanCards
                             .filter((card) => card.messageIndex === index)
