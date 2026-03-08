@@ -48,8 +48,8 @@ export function AgentInputSection() {
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           {/* Heading with styled word */}
-          <h2 className="text-3xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-10">
-            A <span className="italic text-sky-600 dark:text-sky-400">smarter</span> way to train tennis
+          <h2 className="text-2xl md:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-10">
+            play8 AI, a <span className="italic text-sky-600 dark:text-sky-400">smarter</span> way for training
           </h2>
 
           {/* Input area */}
@@ -70,7 +70,7 @@ export function AgentInputSection() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask me anything about tennis..."
+                placeholder="Ask me anything about tennis, padel etc ..."
                 rows={3}
                 className="flex-1 bg-transparent px-4 py-2 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none text-lg resize-none"
               />
