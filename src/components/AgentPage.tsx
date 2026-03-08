@@ -836,11 +836,11 @@ export function AgentPage() {
 
   // Chat content component (used in both desktop and mobile)
   const renderChatContent = (compact: boolean) => (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="h-full flex flex-col bg-white dark:bg-gray-900 overflow-hidden relative">
       {/* Messages Area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto flex flex-col"
+        className="flex-1 overflow-y-auto flex flex-col pb-32 md:pb-0"
       >
         {messages.length === 0 ? (
           // Welcome State - centered in viewport
@@ -1023,8 +1023,8 @@ export function AgentPage() {
         )}
       </div>
 
-      {/* Input Area - Fixed at bottom */}
-      <div className={`flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 ${compact ? 'p-2' : 'p-4'}`}>
+      {/* Input Area - Fixed above tab bar on mobile, normal on desktop */}
+      <div className={`flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 ${compact ? 'p-2' : 'p-4'} md:relative fixed bottom-12 md:bottom-0 left-0 right-0 z-10`}>
         <div className={compact ? '' : 'max-w-3xl mx-auto'}>
           <div className="relative flex items-end bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 focus-within:border-indigo-300 dark:focus-within:border-indigo-600 transition-colors">
             <textarea
