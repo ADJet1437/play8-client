@@ -6,9 +6,6 @@ interface CardCarouselProps {
 
 export default function CardCarousel({ children }: CardCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [translateX, setTranslateX] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -36,64 +33,6 @@ export default function CardCarousel({ children }: CardCarouselProps) {
     }
   };
 
-  // Mouse/Touch drag handlers
-  const handleDragStart = (clientX: number) => {
-    setIsDragging(true);
-    setStartX(clientX);
-    setTranslateX(0);
-  };
-
-  const handleDragMove = (clientX: number) => {
-    if (!isDragging) return;
-    const diff = clientX - startX;
-    setTranslateX(diff);
-  };
-
-  const handleDragEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-
-    // Threshold: swipe 80px to trigger navigation
-    if (translateX < -80 && currentIndex < totalCards - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else if (translateX > 80 && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-
-    setTranslateX(0);
-  };
-
-  // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    handleDragStart(e.clientX);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    handleDragMove(e.clientX);
-  };
-
-  const handleMouseUp = () => {
-    handleDragEnd();
-  };
-
-  const handleMouseLeave = () => {
-    if (isDragging) {
-      handleDragEnd();
-    }
-  };
-
-  // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
-    handleDragStart(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    handleDragMove(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    handleDragEnd();
-  };
 
   // Card width calculation - larger for full-size cards
   const cardWidth = isMobile ? 340 : 650;
@@ -101,8 +40,7 @@ export default function CardCarousel({ children }: CardCarouselProps) {
   const peekAmount = isMobile ? 50 : 100;
 
   // Calculate transform
-  const baseTransform = -(currentIndex * (cardWidth + gap));
-  const currentTransform = baseTransform + translateX;
+  const currentTransform = -(currentIndex * (cardWidth + gap));
 
   if (totalCards === 0) return null;
 
@@ -132,7 +70,7 @@ export default function CardCarousel({ children }: CardCarouselProps) {
                 style={{
                   width: `${cardWidth}px`,
                   minHeight: '500px',
-                  opacity: isDragging ? 0.9 : 1,
+                  opacity: 1,
                 }}
               >
                 {child}
