@@ -39,7 +39,7 @@ export function LanguageSwitcher() {
           />
           
           {/* Dropdown menu */}
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+          <div className="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
             <div className="p-2">
               {languages.map((lang) => (
                 <button

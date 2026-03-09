@@ -79,7 +79,7 @@ export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, 
       {/* Close button */}
       <button
         onClick={onClose}
-        className="fixed top-4 right-4 text-white hover:text-gray-300 p-2 rounded-lg hover:bg-white/10 transition-colors z-10"
+        className="fixed top-4 right-4 text-white hover:text-gray-300 p-2 rounded-lg hover:bg-white/10 transition-colors z-20"
         aria-label="Close training view"
       >
         <svg
