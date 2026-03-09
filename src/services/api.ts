@@ -190,6 +190,13 @@ export const savedSessionApi = {
     const response = await api.delete<DeleteResponse>(`/saved-sessions/${id}`);
     return response.data;
   },
+
+  updateDrillCards: async (id: string, drillCards: DrillCard[]): Promise<SavedTrainingSession> => {
+    const response = await api.patch<SavedTrainingSession>(`/saved-sessions/${id}`, {
+      drill_cards_data: drillCards,
+    });
+    return response.data;
+  },
 };
 
 // Auth API

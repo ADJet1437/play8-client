@@ -8,11 +8,13 @@ interface DrillEditorProps {
   drill: DrillCard;
   onSave: (updatedDrill: DrillCard) => void;
   onClose: () => void;
+  onDone?: (updatedDrill: DrillCard) => void;
 }
 
-export function DrillEditor({ drill, onSave, onClose }: DrillEditorProps) {
+export function DrillEditor({ drill, onSave, onClose, onDone }: DrillEditorProps) {
   const [editedDrill, setEditedDrill] = useState<DrillCard>(drill);
   const [hasChanges, setHasChanges] = useState(false);
+  const [doneSaved, setDoneSaved] = useState(false);
 
   const handleDrillUpdate = (updatedDrill: DrillCard) => {
     setEditedDrill(updatedDrill);
@@ -130,10 +132,22 @@ export function DrillEditor({ drill, onSave, onClose }: DrillEditorProps) {
               Changes are automatically saved as you edit.
             </p>
             <button
-              onClick={onClose}
-              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              onClick={() => {
+                if (onDone) {
+                  onDone(editedDrill);
+                  setDoneSaved(true);
+                  setTimeout(onClose, 600);
+                } else {
+                  onClose();
+                }
+              }}
+              className={`w-full sm:w-auto px-6 py-2.5 font-medium rounded-lg transition-colors ${
+                doneSaved
+                  ? 'bg-green-500 hover:bg-green-600 text-white'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
             >
-              Done Editing
+              {doneSaved ? 'Saved!' : 'Done Editing'}
             </button>
           </div>
         </div>

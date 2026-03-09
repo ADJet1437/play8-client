@@ -12,7 +12,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<SavedTrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeDrillSequence, setActiveDrillSequence] = useState<DrillCard[] | null>(null);
+  const [activeSession, setActiveSession] = useState<SavedTrainingSession | null>(null);
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -44,8 +44,28 @@ export function ProfilePage() {
   };
 
   const handleStartTraining = (session: SavedTrainingSession) => {
-    // Set the drill sequence to activate full-screen training mode
-    setActiveDrillSequence(session.drill_cards_data);
+    setActiveSession(session);
+  };
+
+  const handleDrillDone = async (drillIndex: number, updatedDrill: DrillCard) => {
+    if (!activeSession) return;
+
+    const updatedDrills = activeSession.drill_cards_data.map((d, i) =>
+      i === drillIndex ? updatedDrill : d
+    );
+
+    setActiveSession((prev) => prev ? { ...prev, drill_cards_data: updatedDrills } : prev);
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === activeSession.id ? { ...s, drill_cards_data: updatedDrills } : s
+      )
+    );
+
+    try {
+      await savedSessionApi.updateDrillCards(activeSession.id, updatedDrills);
+    } catch (error) {
+      console.error('Failed to update drill cards:', error);
+    }
   };
 
   if (!isAuthenticated || !user) {
@@ -113,10 +133,11 @@ export function ProfilePage() {
       </div>
 
         {/* Full-screen drill sequence view */}
-        {activeDrillSequence && (
+        {activeSession && (
           <DrillSequenceView
-            drills={activeDrillSequence}
-            onClose={() => setActiveDrillSequence(null)}
+            drills={activeSession.drill_cards_data}
+            onClose={() => setActiveSession(null)}
+            onDrillDone={handleDrillDone}
           />
         )}
       </div>

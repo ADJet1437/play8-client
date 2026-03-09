@@ -11,6 +11,8 @@ interface DrillCardComponentProps {
   currentDrill?: number;
   totalDrills?: number;
   onDrillUpdate?: (updatedDrill: DrillCard) => void;
+  onDrillDone?: (updatedDrill: DrillCard) => void;
+  onUseSetting?: () => void;
 }
 
 export default function DrillCardComponent({
@@ -20,6 +22,8 @@ export default function DrillCardComponent({
   currentDrill,
   totalDrills,
   onDrillUpdate,
+  onDrillDone,
+  onUseSetting,
 }: DrillCardComponentProps) {
   const [showEditor, setShowEditor] = useState(false);
   const [currentCard, setCurrentCard] = useState(card);
@@ -302,6 +306,14 @@ export default function DrillCardComponent({
             Previous Drill
           </button>
         )}
+        {onUseSetting && (
+          <button
+            onClick={onUseSetting}
+            className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+          >
+            Use new setting
+          </button>
+        )}
         {onNext && (
           <button
             onClick={onNext}
@@ -337,6 +349,7 @@ export default function DrillCardComponent({
           drill={currentCard}
           onSave={handleDrillUpdate}
           onClose={() => setShowEditor(false)}
+          onDone={onDrillDone}
         />
       )}
     </div>
