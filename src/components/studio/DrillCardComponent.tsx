@@ -13,6 +13,7 @@ interface DrillCardComponentProps {
   onDrillUpdate?: (updatedDrill: DrillCard) => void;
   onDrillDone?: (updatedDrill: DrillCard) => void;
   onUseSetting?: () => void;
+  allowEdit?: boolean;
 }
 
 export default function DrillCardComponent({
@@ -24,6 +25,7 @@ export default function DrillCardComponent({
   onDrillUpdate,
   onDrillDone,
   onUseSetting,
+  allowEdit = false,
 }: DrillCardComponentProps) {
   const [showEditor, setShowEditor] = useState(false);
   const [currentCard, setCurrentCard] = useState(card);
@@ -54,13 +56,15 @@ export default function DrillCardComponent({
             <h2 className="text-lg font-bold">{currentCard.title}</h2>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowEditor(true)}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              title="Edit drill parameters"
-            >
-              <FiEdit2 size={18} />
-            </button>
+            {allowEdit && (
+              <button
+                onClick={() => setShowEditor(true)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                title="Edit drill parameters"
+              >
+                <FiEdit2 size={18} />
+              </button>
+            )}
             <div className="bg-white/20 rounded-lg px-2.5 py-0.5 text-xs font-medium">
               {currentCard.duration}
             </div>

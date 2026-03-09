@@ -137,6 +137,7 @@ export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, 
           onDrillUpdate={handleDrillUpdate}
           onDrillDone={onDrillDone ? (updatedDrill) => onDrillDone(currentIndex, updatedDrill) : undefined}
           onUseSetting={trainingPlan && onUseSetting && hasChanges ? () => onUseSetting(trainingPlan, localDrills) : undefined}
+          allowEdit
         />
 
         {/* Keyboard hints */}
