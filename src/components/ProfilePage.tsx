@@ -12,7 +12,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<SavedTrainingSession[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeDrillSequence, setActiveDrillSequence] = useState<DrillCard[] | null>(null);
+  const [activeSession, setActiveSession] = useState<SavedTrainingSession | null>(null);
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -44,8 +44,28 @@ export function ProfilePage() {
   };
 
   const handleStartTraining = (session: SavedTrainingSession) => {
-    // Set the drill sequence to activate full-screen training mode
-    setActiveDrillSequence(session.drill_cards_data);
+    setActiveSession(session);
+  };
+
+  const handleDrillDone = async (drillIndex: number, updatedDrill: DrillCard) => {
+    if (!activeSession) return;
+
+    const updatedDrills = activeSession.drill_cards_data.map((d, i) =>
+      i === drillIndex ? updatedDrill : d
+    );
+
+    setActiveSession((prev) => prev ? { ...prev, drill_cards_data: updatedDrills } : prev);
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === activeSession.id ? { ...s, drill_cards_data: updatedDrills } : s
+      )
+    );
+
+    try {
+      await savedSessionApi.updateDrillCards(activeSession.id, updatedDrills);
+    } catch (error) {
+      console.error('Failed to update drill cards:', error);
+    }
   };
 
   if (!isAuthenticated || !user) {
@@ -65,15 +85,16 @@ export function ProfilePage() {
       .slice(0, 2);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Back button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-6 transition-colors"
-      >
-        <FiArrowLeft size={16} />
-        Back
-      </button>
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-6 transition-colors"
+        >
+          <FiArrowLeft size={16} />
+          Back
+        </button>
 
       {/* User info */}
       <div className="flex items-center gap-4 mb-8">
@@ -111,13 +132,15 @@ export function ProfilePage() {
         )}
       </div>
 
-      {/* Full-screen drill sequence view */}
-      {activeDrillSequence && (
-        <DrillSequenceView
-          drills={activeDrillSequence}
-          onClose={() => setActiveDrillSequence(null)}
-        />
-      )}
+        {/* Full-screen drill sequence view */}
+        {activeSession && (
+          <DrillSequenceView
+            drills={activeSession.drill_cards_data}
+            onClose={() => setActiveSession(null)}
+            onDrillDone={handleDrillDone}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -37,6 +37,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   blocks?: ContentBlock[]; // Maintains chronological order of text and cards
+  trainingSession?: { plan: TrainingPlanCard; drills: DrillCard[] }; // Set when user sends edited training session
 }
 
 // Compact markdown components for narrow chat panel
@@ -184,7 +185,7 @@ export function AgentPage() {
   // New card types state
   const [trainingPlanCards, setTrainingPlanCards] = useState<TrainingPlanCard[]>([]);
   const [drillCards, setDrillCards] = useState<DrillCard[]>([]);
-  const [activeDrillSequence, setActiveDrillSequence] = useState<DrillCard[] | null>(null);
+  const [activeTrainingView, setActiveTrainingView] = useState<{ plan: TrainingPlanCard; drills: DrillCard[] } | null>(null);
 
   // Tool loading state (track which message index has loading tools)
   const [toolLoadingByMessage, setToolLoadingByMessage] = useState<Map<number, boolean>>(new Map());
@@ -598,6 +599,21 @@ export function AgentPage() {
     }
   }, [conversations, login, parseToolResultCards, navigate, urlConversationId]);
 
+  // Send edited training session as user message and close the training view
+  const handleUseSetting = useCallback((plan: TrainingPlanCard, drills: DrillCard[]) => {
+    setActiveTrainingView(null);
+    if (isLoading) return;
+    if (!isAuthenticated) { login(); return; }
+
+    const content = `I've updated my training session with new settings:\n\n${JSON.stringify({ plan, drills }, null, 2)}`;
+    const userMessage: Message = { role: 'user', content, trainingSession: { plan, drills } };
+    const currentMessages = [...messages, userMessage];
+
+    setMessages(currentMessages);
+    setIsLoading(true);
+    fetchResponse(content, messages, urlConversationId ?? null);
+  }, [isLoading, isAuthenticated, login, messages, fetchResponse, urlConversationId]);
+
   // Send a new message (adds user message to state, then fetches response)
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
@@ -656,6 +672,21 @@ export function AgentPage() {
     }
   };
 
+  // Parse training session from user message content (for reconstructing trainingSession field)
+  const parseTrainingSessionFromContent = useCallback((content: string) => {
+    const prefix = "I've updated my training session with new settings:\n\n";
+    if (!content.startsWith(prefix)) return undefined;
+    try {
+      const json = JSON.parse(content.slice(prefix.length));
+      if (json.plan && json.drills) {
+        return { plan: json.plan as TrainingPlanCard, drills: json.drills as DrillCard[] };
+      }
+    } catch {
+      // not a training session message
+    }
+    return undefined;
+  }, []);
+
   // Load conversation from API (used by URL effect and sidebar)
   const loadConversation = useCallback(async (id: string) => {
     if (loadedConversationRef.current === id) return;
@@ -666,7 +697,8 @@ export function AgentPage() {
       // Build messages with blocks structure from content_blocks
       const messagesWithBlocks = detail.messages.map((msg) => {
         if (msg.role === 'user') {
-          return { role: 'user' as const, content: msg.content };
+          const trainingSession = parseTrainingSessionFromContent(msg.content);
+          return { role: 'user' as const, content: msg.content, ...(trainingSession && { trainingSession }) };
         }
 
         // For assistant messages, reconstruct blocks from content_blocks
@@ -760,7 +792,7 @@ export function AgentPage() {
       // Conversation may have been deleted — redirect to empty state
       navigate('/agent', { replace: true });
     }
-  }, [parseToolResultCards, navigate]);
+  }, [parseToolResultCards, parseTrainingSessionFromContent, navigate]);
 
   // Load conversation when URL param changes
   useEffect(() => {
@@ -855,14 +887,56 @@ export function AgentPage() {
             <div className={`w-full mx-auto space-y-4 ${compact ? 'px-3 py-4' : 'px-4 py-8 max-w-3xl space-y-6'}`}>
               {messages.map((message, index) => (
                 <div key={index} className="space-y-4">
-                  <div className={message.role === 'user' ? 'flex justify-end' : 'text-left'}>
+                  <div className={message.role === 'user' && !message.trainingSession ? 'flex justify-end' : 'text-left'}>
                     {message.role === 'user' ? (
-                      // User message - bubble style
+                      message.trainingSession ? (
+                        // User training session message - same carousel format as assistant tool_use block
+                        <div className="space-y-2 ml-12 md:ml-20">
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-0.5">
+                              ✏️ Updated Training Session by you
+                            </span>
+                          </div>
+                          <div>
+                            {(() => {
+                              const plan = message.trainingSession.plan;
+                              const drills = [...message.trainingSession.drills].sort(
+                                (a, b) => a.drill_number - b.drill_number
+                              );
+                              const carouselChildren = [
+                                <TrainingPlanCardComponent
+                                  key="training-card"
+                                  card={plan}
+                                  drillCards={drills}
+                                  onStartTraining={
+                                    drills.length > 0
+                                      ? () => setActiveTrainingView({ plan, drills })
+                                      : undefined
+                                  }
+                                />,
+                                ...drills.map((drill) => (
+                                  <DrillCardComponent
+                                    key={drill.drill_number}
+                                    card={drill}
+                                    onNext={() => {}}
+                                    onPrevious={() => {}}
+                                    currentDrill={drill.drill_number}
+                                    totalDrills={drills.length}
+                                  />
+                                )),
+                              ];
+                              return <CardCarousel>{carouselChildren}</CardCarousel>;
+                            })()}
+                          </div>
+                        </div>
+                      ) : (
+                      // User text message - bubble style
                       <div className={`bg-indigo-600 text-white rounded-2xl ${compact ? 'max-w-[90%] px-3 py-2' : 'max-w-[85%] px-4 py-3'}`}>
                         <p className={`whitespace-pre-wrap text-left ${compact ? 'text-sm leading-6' : 'leading-7'}`}>
                           {message.content}
                         </p>
                       </div>
+                      )
                     ) : (
                       // Assistant message - render blocks in chronological order
                       <div className="text-left text-gray-900 dark:text-gray-100 space-y-4">
@@ -894,7 +968,7 @@ export function AgentPage() {
                                           drillCards={relatedDrills}
                                           onStartTraining={
                                             relatedDrills.length > 0
-                                              ? () => setActiveDrillSequence(relatedDrills)
+                                              ? () => setActiveTrainingView({ plan: card, drills: relatedDrills })
                                               : undefined
                                           }
                                         />,
@@ -952,7 +1026,7 @@ export function AgentPage() {
                                   drillCards={relatedDrills}
                                   onStartTraining={
                                     relatedDrills.length > 0
-                                      ? () => setActiveDrillSequence(relatedDrills)
+                                      ? () => setActiveTrainingView({ plan: card, drills: relatedDrills })
                                       : undefined
                                   }
                                 />,
@@ -1130,10 +1204,12 @@ export function AgentPage() {
       </div>
 
       {/* Drill Sequence Full-Screen View */}
-      {activeDrillSequence && (
+      {activeTrainingView && (
         <DrillSequenceView
-          drills={activeDrillSequence}
-          onClose={() => setActiveDrillSequence(null)}
+          drills={activeTrainingView.drills}
+          onClose={() => setActiveTrainingView(null)}
+          trainingPlan={activeTrainingView.plan}
+          onUseSetting={handleUseSetting}
         />
       )}
     </div>

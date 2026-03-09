@@ -1,5 +1,8 @@
+import { useState } from 'react';
+import { FiEdit2 } from 'react-icons/fi';
 import { DrillCard } from '../../types';
 import { CourtDiagram } from './CourtDiagram';
+import { DrillEditor } from './DrillEditor';
 
 interface DrillCardComponentProps {
   card: DrillCard;
@@ -7,6 +10,9 @@ interface DrillCardComponentProps {
   onPrevious?: () => void;
   currentDrill?: number;
   totalDrills?: number;
+  onDrillUpdate?: (updatedDrill: DrillCard) => void;
+  onDrillDone?: (updatedDrill: DrillCard) => void;
+  onUseSetting?: () => void;
 }
 
 export default function DrillCardComponent({
@@ -15,10 +21,21 @@ export default function DrillCardComponent({
   onPrevious,
   currentDrill,
   totalDrills,
+  onDrillUpdate,
+  onDrillDone,
+  onUseSetting,
 }: DrillCardComponentProps) {
+  const [showEditor, setShowEditor] = useState(false);
+  const [currentCard, setCurrentCard] = useState(card);
+
   // Check if this is new format (ball_sequence) or legacy (parameters)
-  const hasNewFormat = card.ball_sequence && card.ball_sequence.length > 0;
-  const hasLegacyFormat = card.parameters;
+  const hasNewFormat = currentCard.ball_sequence && currentCard.ball_sequence.length > 0;
+  const hasLegacyFormat = currentCard.parameters;
+
+  const handleDrillUpdate = (updatedDrill: DrillCard) => {
+    setCurrentCard(updatedDrill);
+    onDrillUpdate?.(updatedDrill);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto h-[750px] flex flex-col">
@@ -27,25 +44,34 @@ export default function DrillCardComponent({
         <div className="flex justify-between items-start mb-1">
           <div className="flex-1">
             <div className="text-xs font-medium opacity-90 mb-0.5">
-              Drill {card.drill_number}
+              Drill {currentCard.drill_number}
               {currentDrill && totalDrills && (
                 <span className="ml-1.5">
                   ({currentDrill}/{totalDrills})
                 </span>
               )}
             </div>
-            <h2 className="text-lg font-bold">{card.title}</h2>
+            <h2 className="text-lg font-bold">{currentCard.title}</h2>
           </div>
-          <div className="bg-white/20 rounded-lg px-2.5 py-0.5 text-xs font-medium">
-            {card.duration}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowEditor(true)}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title="Edit drill parameters"
+            >
+              <FiEdit2 size={18} />
+            </button>
+            <div className="bg-white/20 rounded-lg px-2.5 py-0.5 text-xs font-medium">
+              {currentCard.duration}
+            </div>
           </div>
         </div>
-        <p className="text-blue-100 text-xs line-clamp-1 mb-1.5">{card.description}</p>
+        <p className="text-blue-100 text-xs line-clamp-1 mb-1.5">{currentCard.description}</p>
 
         {/* Focus Points - Vertical with checkmarks */}
-        {card.focus_points.length > 0 && (
+        {currentCard.focus_points.length > 0 && (
           <div className="space-y-0.5 mt-1.5">
-            {card.focus_points.map((point, index) => (
+            {currentCard.focus_points.map((point, index) => (
               <div key={index} className="flex items-start gap-1.5">
                 <svg
                   className="w-3 h-3 text-green-300 mt-0.5 flex-shrink-0"
@@ -88,9 +114,9 @@ export default function DrillCardComponent({
             />
           </svg>
           PongBot Settings
-          {hasNewFormat && card.sequence_repetitions && (
+          {hasNewFormat && currentCard.sequence_repetitions && (
             <span className="ml-auto text-sm font-normal text-gray-600">
-              Repeat {card.sequence_repetitions}x
+              Repeat {currentCard.sequence_repetitions}x
             </span>
           )}
         </h3>
@@ -99,8 +125,8 @@ export default function DrillCardComponent({
         {hasNewFormat && (
           <div className="mb-3 bg-gray-50 rounded-lg p-2">
             <CourtDiagram
-              machinePosition={card.machine_position}
-              ballSequence={card.ball_sequence}
+              machinePosition={currentCard.machine_position}
+              ballSequence={currentCard.ball_sequence}
             />
           </div>
         )}
@@ -114,7 +140,7 @@ export default function DrillCardComponent({
                   <th className="px-2 py-1.5 text-left font-semibold text-gray-700 border-b border-r border-gray-200 sticky left-0 bg-gray-50">
                     Parameter
                   </th>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <th key={ball.ball_number} className="px-2 py-1.5 text-center font-semibold text-gray-900 border-b border-gray-200 min-w-[70px]">
                       Ball {ball.ball_number}
                     </th>
@@ -126,7 +152,7 @@ export default function DrillCardComponent({
                   <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
                     Spin Type
                   </td>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
                       {ball.spin_type}
                     </td>
@@ -136,7 +162,7 @@ export default function DrillCardComponent({
                   <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
                     Spin Strength
                   </td>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
                       {ball.spin_strength}/10
                     </td>
@@ -146,7 +172,7 @@ export default function DrillCardComponent({
                   <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
                     Speed
                   </td>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
                       {ball.speed}/10
                     </td>
@@ -156,7 +182,7 @@ export default function DrillCardComponent({
                   <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
                     Drop Point
                   </td>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
                       {ball.drop_point}
                     </td>
@@ -166,7 +192,7 @@ export default function DrillCardComponent({
                   <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
                     Depth
                   </td>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
                       {ball.depth}/20
                     </td>
@@ -176,7 +202,7 @@ export default function DrillCardComponent({
                   <td className="px-2 py-1 font-medium text-gray-700 border-r border-gray-200 bg-gray-50 sticky left-0">
                     Feed (s)
                   </td>
-                  {card.ball_sequence!.map((ball) => (
+                  {currentCard.ball_sequence!.map((ball) => (
                     <td key={ball.ball_number} className="px-2 py-1 text-center text-gray-900">
                       {ball.feed}
                     </td>
@@ -207,7 +233,7 @@ export default function DrillCardComponent({
                     Spin
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {card.parameters!.spin}
+                    {currentCard.parameters!.spin}
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
@@ -215,7 +241,7 @@ export default function DrillCardComponent({
                     Height
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {card.parameters!.height}
+                    {currentCard.parameters!.height}
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
@@ -223,7 +249,7 @@ export default function DrillCardComponent({
                     Distance
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {card.parameters!.distance}
+                    {currentCard.parameters!.distance}
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
@@ -231,7 +257,7 @@ export default function DrillCardComponent({
                     Repetitions
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {card.parameters!.repetitions} balls
+                    {currentCard.parameters!.repetitions} balls
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
@@ -239,7 +265,7 @@ export default function DrillCardComponent({
                     Location
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {card.parameters!.location}
+                    {currentCard.parameters!.location}
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
@@ -247,7 +273,7 @@ export default function DrillCardComponent({
                     Speed
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {card.parameters!.speed}
+                    {currentCard.parameters!.speed}
                   </td>
                 </tr>
               </tbody>
@@ -280,6 +306,14 @@ export default function DrillCardComponent({
             Previous Drill
           </button>
         )}
+        {onUseSetting && (
+          <button
+            onClick={onUseSetting}
+            className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+          >
+            Use new setting
+          </button>
+        )}
         {onNext && (
           <button
             onClick={onNext}
@@ -308,6 +342,16 @@ export default function DrillCardComponent({
           </button>
         )}
       </div>
+
+      {/* Drill Editor Modal */}
+      {showEditor && (
+        <DrillEditor
+          drill={currentCard}
+          onSave={handleDrillUpdate}
+          onClose={() => setShowEditor(false)}
+          onDone={onDrillDone}
+        />
+      )}
     </div>
   );
 }

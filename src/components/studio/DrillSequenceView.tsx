@@ -1,15 +1,25 @@
 import { useState, useEffect } from 'react';
-import { DrillCard } from '../../types';
+import { DrillCard, TrainingPlanCard } from '../../types';
 import DrillCardComponent from './DrillCardComponent';
 
 interface DrillSequenceViewProps {
   drills: DrillCard[];
   onClose: () => void;
+  onDrillDone?: (drillIndex: number, updatedDrill: DrillCard) => void;
+  trainingPlan?: TrainingPlanCard;
+  onUseSetting?: (plan: TrainingPlanCard, drills: DrillCard[]) => void;
 }
 
-export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
+export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, onUseSetting }: DrillSequenceViewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const currentDrill = drills[currentIndex];
+  const [localDrills, setLocalDrills] = useState<DrillCard[]>(drills);
+
+  const currentDrill = localDrills[currentIndex];
+  const hasChanges = JSON.stringify(localDrills) !== JSON.stringify(drills);
+
+  const handleDrillUpdate = (updatedDrill: DrillCard) => {
+    setLocalDrills((prev) => prev.map((d, i) => (i === currentIndex ? updatedDrill : d)));
+  };
 
   // Set up keyboard navigation
   useEffect(() => {
@@ -29,10 +39,10 @@ export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, drills.length]); // Re-attach when index changes
+  }, [currentIndex, localDrills.length]); // Re-attach when index changes
 
   const handleNext = () => {
-    if (currentIndex < drills.length - 1) {
+    if (currentIndex < localDrills.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
       // Training complete
@@ -47,7 +57,7 @@ export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
   };
 
   const handleKeyboardNext = () => {
-    if (currentIndex < drills.length - 1) {
+    if (currentIndex < localDrills.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
       onClose();
@@ -100,12 +110,12 @@ export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
             />
           </svg>
           <span className="text-white font-medium">
-            Drill {currentIndex + 1} of {drills.length}
+            Drill {currentIndex + 1} of {localDrills.length}
           </span>
           <div className="ml-2 h-1.5 w-32 bg-white/20 rounded-full overflow-hidden">
             <div
               className="h-full bg-green-400 transition-all duration-300"
-              style={{ width: `${((currentIndex + 1) / drills.length) * 100}%` }}
+              style={{ width: `${((currentIndex + 1) / localDrills.length) * 100}%` }}
             />
           </div>
         </div>
@@ -118,7 +128,10 @@ export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
           onNext={handleNext}
           onPrevious={handlePrevious}
           currentDrill={currentIndex + 1}
-          totalDrills={drills.length}
+          totalDrills={localDrills.length}
+          onDrillUpdate={handleDrillUpdate}
+          onDrillDone={onDrillDone ? (updatedDrill) => onDrillDone(currentIndex, updatedDrill) : undefined}
+          onUseSetting={trainingPlan && onUseSetting && hasChanges ? () => onUseSetting(trainingPlan, localDrills) : undefined}
         />
 
         {/* Keyboard hints */}
@@ -129,7 +142,7 @@ export function DrillSequenceView({ drills, onClose }: DrillSequenceViewProps) {
               <span>Previous</span>
             </div>
           )}
-          {currentIndex < drills.length - 1 && (
+          {currentIndex < localDrills.length - 1 && (
             <div className="flex items-center gap-1">
               <kbd className="px-2 py-1 bg-white/10 rounded">→</kbd>
               <span>Next</span>
