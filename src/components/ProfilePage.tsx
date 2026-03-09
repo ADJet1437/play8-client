@@ -65,15 +65,16 @@ export function ProfilePage() {
       .slice(0, 2);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Back button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-6 transition-colors"
-      >
-        <FiArrowLeft size={16} />
-        Back
-      </button>
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-6 transition-colors"
+        >
+          <FiArrowLeft size={16} />
+          Back
+        </button>
 
       {/* User info */}
       <div className="flex items-center gap-4 mb-8">
@@ -111,13 +112,14 @@ export function ProfilePage() {
         )}
       </div>
 
-      {/* Full-screen drill sequence view */}
-      {activeDrillSequence && (
-        <DrillSequenceView
-          drills={activeDrillSequence}
-          onClose={() => setActiveDrillSequence(null)}
-        />
-      )}
+        {/* Full-screen drill sequence view */}
+        {activeDrillSequence && (
+          <DrillSequenceView
+            drills={activeDrillSequence}
+            onClose={() => setActiveDrillSequence(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }
