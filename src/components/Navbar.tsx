@@ -35,15 +35,31 @@ export function Navbar() {
         
         {/* Desktop menu */}
         <div className="hidden md:flex items-center space-x-4">
-          <a 
-            href="/#booking" 
+          <a
+            href="/#booking"
             className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
           >
             {t('booking')}
           </a>
-          <a 
-            href="https://store.play8.ai" 
-            target="_blank" 
+          {isAuthenticated && (
+            <Link
+              to="/agent"
+              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
+            >
+              {t('history')}
+            </Link>
+          )}
+          {isAuthenticated && (
+            <Link
+              to="/profile"
+              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
+            >
+              {t('myPlan')}
+            </Link>
+          )}
+          <a
+            href="https://store.play8.ai"
+            target="_blank"
             rel="noopener noreferrer"
             className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
           >
@@ -69,16 +85,34 @@ export function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden mt-4 bg-white dark:bg-gray-800 transition-colors">
           <div className="flex flex-col space-y-4 px-4 py-2">
-            <a 
-              href="/#booking" 
+            <a
+              href="/#booking"
               className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('booking')}
             </a>
-            <a 
-              href="https://store.play8.ai" 
-              target="_blank" 
+            {isAuthenticated && (
+              <Link
+                to="/agent"
+                className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t('history')}
+              </Link>
+            )}
+            {isAuthenticated && (
+              <Link
+                to="/profile"
+                className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t('myPlan')}
+              </Link>
+            )}
+            <a
+              href="https://store.play8.ai"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2"
               onClick={() => setIsMenuOpen(false)}

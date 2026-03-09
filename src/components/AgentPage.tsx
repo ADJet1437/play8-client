@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FiArrowUp, FiMessageCircle, FiSidebar } from 'react-icons/fi';
+import { FiArrowUp, FiBookOpen, FiSidebar } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ConversationSidebar } from './ConversationSidebar';
@@ -202,7 +202,7 @@ export function AgentPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(() => !!initialMessage?.trim());
   const [isStreaming, setIsStreaming] = useState(false);
-  const [mobileTab, setMobileTab] = useState<'chat' | 'history'>('chat');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasProcessedInitialMessage = useRef(false);
@@ -787,7 +787,7 @@ export function AgentPage() {
       setGeneratedCards(restoredLegacyCards);
       setTrainingPlanCards(restoredTrainingPlans);
       setDrillCards(restoredDrills);
-      setMobileTab('chat');
+      setMobileSidebarOpen(false);
     } catch {
       // Conversation may have been deleted — redirect to empty state
       navigate('/agent', { replace: true });
@@ -828,7 +828,6 @@ export function AgentPage() {
 
   const handleNewChat = () => {
     navigate('/agent');
-    setMobileTab('chat');
     textareaRef.current?.focus();
   };
 
@@ -1161,46 +1160,48 @@ export function AgentPage() {
 
       {/* Mobile Layout */}
       <div className="flex md:hidden flex-1 flex-col min-h-0 overflow-hidden">
-        {/* Content Area */}
-        <div className="flex-1 min-h-0 overflow-hidden">
-          {mobileTab === 'chat' ? (
-            renderChatContent(false)
-          ) : (
-            <ConversationSidebar
-              conversations={conversations}
-              currentConversationId={urlConversationId ?? null}
-              onSelectConversation={handleSelectConversation}
-              onNewChat={handleNewChat}
-              onDeleteConversation={handleDeleteConversation}
-            />
-          )}
+        {/* Mobile top bar */}
+        <div className="flex-shrink-0 flex items-center px-3 py-1.5 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <button
+            onClick={() => setMobileSidebarOpen(true)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg transition-colors"
+            title="Chat history"
+          >
+            <FiBookOpen size={20} />
+          </button>
         </div>
 
-        {/* Mobile Tab Bar - Only Chat and History */}
-        <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-          <button
-            onClick={() => setMobileTab('chat')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-              mobileTab === 'chat'
-                ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
-                : 'text-gray-500 dark:text-gray-400'
-            }`}
-          >
-            <FiMessageCircle size={18} />
-            Chat
-          </button>
-          <button
-            onClick={() => setMobileTab('history')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-              mobileTab === 'history'
-                ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
-                : 'text-gray-500 dark:text-gray-400'
-            }`}
-          >
-            <FiSidebar size={18} />
-            History
-          </button>
+        {/* Chat content — always shown */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          {renderChatContent(false)}
         </div>
+
+        {/* Sidebar overlay */}
+        {mobileSidebarOpen && (
+          <>
+            {/* Backdrop — covers full screen, closes sidebar on tap */}
+            <div
+              className="fixed inset-0 z-40 bg-black/50"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+            {/* Sidebar — 80% width from left */}
+            <div className="fixed inset-y-0 left-0 z-50 w-[80%] bg-white dark:bg-gray-900 shadow-2xl flex flex-col">
+              <ConversationSidebar
+                conversations={conversations}
+                currentConversationId={urlConversationId ?? null}
+                onSelectConversation={(id) => {
+                  handleSelectConversation(id);
+                  setMobileSidebarOpen(false);
+                }}
+                onNewChat={() => {
+                  handleNewChat();
+                  setMobileSidebarOpen(false);
+                }}
+                onDeleteConversation={handleDeleteConversation}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Drill Sequence Full-Screen View */}

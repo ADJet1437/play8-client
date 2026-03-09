@@ -6,7 +6,9 @@
   "login": "Login",
   "logout": "Logout",
   "loggingOut": "Logging out...",
-  "profile": "Profile"
+  "profile": "Profile",
+  "history": "History",
+  "myPlan": "My Plan"
 }
 
 
