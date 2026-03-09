@@ -12,6 +12,7 @@ interface DrillEditorProps {
 }
 
 export function DrillEditor({ drill, onSave, onClose, onDone }: DrillEditorProps) {
+  const [originalDrill] = useState<DrillCard>(() => JSON.parse(JSON.stringify(drill)));
   const [editedDrill, setEditedDrill] = useState<DrillCard>(drill);
   const [hasChanges, setHasChanges] = useState(false);
   const [doneSaved, setDoneSaved] = useState(false);
@@ -24,9 +25,9 @@ export function DrillEditor({ drill, onSave, onClose, onDone }: DrillEditorProps
   };
 
   const handleReset = () => {
-    setEditedDrill(drill);
+    setEditedDrill(originalDrill);
     setHasChanges(false);
-    onSave(drill); // Reset to original
+    onSave(originalDrill);
   };
 
   return (
