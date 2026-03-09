@@ -140,25 +140,6 @@ export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, 
           allowEdit
         />
 
-        {/* Keyboard hints */}
-        <div className="mt-4 flex justify-center gap-4 text-sm text-white/60">
-          {currentIndex > 0 && (
-            <div className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white/10 rounded">←</kbd>
-              <span>Previous</span>
-            </div>
-          )}
-          {currentIndex < localDrills.length - 1 && (
-            <div className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white/10 rounded">→</kbd>
-              <span>Next</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1">
-            <kbd className="px-2 py-1 bg-white/10 rounded">Esc</kbd>
-            <span>Exit</span>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -65,9 +65,9 @@ export function DrillEditor({ drill, onSave, onClose, onDone }: DrillEditorProps
         </div>
 
         {/* Main content: Court + Table (stacked on mobile, side-by-side on desktop) */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
           {/* Interactive Court */}
-          <div className="w-full lg:flex-[6] p-3 md:p-6 flex flex-col overflow-hidden">
+          <div className="w-full lg:flex-[6] p-3 md:p-6 flex flex-col lg:overflow-hidden">
             <div className="mb-2 md:mb-4 flex-shrink-0">
               <h3 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
                 Interactive Court
