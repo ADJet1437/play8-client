@@ -122,16 +122,8 @@ export default function CardCarousel({ children }: CardCarouselProps) {
             className="flex items-stretch transition-transform duration-300 ease-out"
             style={{
               transform: `translateX(${currentTransform}px)`,
-              cursor: isDragging ? 'grabbing' : 'grab',
               gap: `${gap}px`,
             }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseLeave}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             {children.map((child, index) => (
               <div
