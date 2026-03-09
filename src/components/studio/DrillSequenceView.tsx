@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { DrillCard, TrainingPlanCard } from '../../types';
 import DrillCardComponent from './DrillCardComponent';
 
@@ -12,14 +12,18 @@ interface DrillSequenceViewProps {
 
 export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, onUseSetting }: DrillSequenceViewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [localDrills, setLocalDrills] = useState<DrillCard[]>(drills);
+  const currentIndexRef = useRef(currentIndex);
+  currentIndexRef.current = currentIndex;
+  const [localDrills, setLocalDrills] = useState<DrillCard[]>(() =>
+    JSON.parse(JSON.stringify(drills))
+  );
 
   const currentDrill = localDrills[currentIndex];
   const hasChanges = JSON.stringify(localDrills) !== JSON.stringify(drills);
 
-  const handleDrillUpdate = (updatedDrill: DrillCard) => {
-    setLocalDrills((prev) => prev.map((d, i) => (i === currentIndex ? updatedDrill : d)));
-  };
+  const handleDrillUpdate = useCallback((updatedDrill: DrillCard) => {
+    setLocalDrills((prev) => prev.map((d, i) => (i === currentIndexRef.current ? updatedDrill : d)));
+  }, []);
 
   // Set up keyboard navigation
   useEffect(() => {
@@ -124,6 +128,7 @@ export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, 
       {/* Drill card */}
       <div className="w-full max-w-3xl mt-16 mb-4">
         <DrillCardComponent
+          key={currentIndex}
           card={currentDrill}
           onNext={handleNext}
           onPrevious={handlePrevious}
@@ -132,27 +137,9 @@ export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, 
           onDrillUpdate={handleDrillUpdate}
           onDrillDone={onDrillDone ? (updatedDrill) => onDrillDone(currentIndex, updatedDrill) : undefined}
           onUseSetting={trainingPlan && onUseSetting && hasChanges ? () => onUseSetting(trainingPlan, localDrills) : undefined}
+          allowEdit
         />
 
-        {/* Keyboard hints */}
-        <div className="mt-4 flex justify-center gap-4 text-sm text-white/60">
-          {currentIndex > 0 && (
-            <div className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white/10 rounded">←</kbd>
-              <span>Previous</span>
-            </div>
-          )}
-          {currentIndex < localDrills.length - 1 && (
-            <div className="flex items-center gap-1">
-              <kbd className="px-2 py-1 bg-white/10 rounded">→</kbd>
-              <span>Next</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1">
-            <kbd className="px-2 py-1 bg-white/10 rounded">Esc</kbd>
-            <span>Exit</span>
-          </div>
-        </div>
       </div>
     </div>
   );

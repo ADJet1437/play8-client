@@ -13,6 +13,7 @@ interface DrillCardComponentProps {
   onDrillUpdate?: (updatedDrill: DrillCard) => void;
   onDrillDone?: (updatedDrill: DrillCard) => void;
   onUseSetting?: () => void;
+  allowEdit?: boolean;
 }
 
 export default function DrillCardComponent({
@@ -24,6 +25,7 @@ export default function DrillCardComponent({
   onDrillUpdate,
   onDrillDone,
   onUseSetting,
+  allowEdit = false,
 }: DrillCardComponentProps) {
   const [showEditor, setShowEditor] = useState(false);
   const [currentCard, setCurrentCard] = useState(card);
@@ -38,7 +40,7 @@ export default function DrillCardComponent({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto h-[750px] flex flex-col">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto flex flex-col">
       {/* Header - Compact with Focus Points */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
         <div className="flex justify-between items-start mb-1">
@@ -54,13 +56,15 @@ export default function DrillCardComponent({
             <h2 className="text-lg font-bold">{currentCard.title}</h2>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowEditor(true)}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              title="Edit drill parameters"
-            >
-              <FiEdit2 size={18} />
-            </button>
+            {allowEdit && (
+              <button
+                onClick={() => setShowEditor(true)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                title="Edit drill parameters"
+              >
+                <FiEdit2 size={18} />
+              </button>
+            )}
             <div className="bg-white/20 rounded-lg px-2.5 py-0.5 text-xs font-medium">
               {currentCard.duration}
             </div>
@@ -92,7 +96,7 @@ export default function DrillCardComponent({
       </div>
 
       {/* PongBot Settings */}
-      <div className="p-4 flex-1">
+      <div className="p-4">
         <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
           <svg
             className="w-5 h-5 mr-2 text-blue-600"
