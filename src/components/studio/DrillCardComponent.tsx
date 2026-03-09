@@ -42,8 +42,8 @@ export default function DrillCardComponent({
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto flex flex-col">
       {/* Header - Compact with Focus Points */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-        <div className="flex justify-between items-start mb-1">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-2.5 sm:p-4">
+        <div className="flex justify-between items-start mb-0.5 sm:mb-1">
           <div className="flex-1">
             <div className="text-xs font-medium opacity-90 mb-0.5">
               Drill {currentCard.drill_number}
@@ -53,28 +53,28 @@ export default function DrillCardComponent({
                 </span>
               )}
             </div>
-            <h2 className="text-lg font-bold">{currentCard.title}</h2>
+            <h2 className="text-sm sm:text-lg font-bold leading-tight">{currentCard.title}</h2>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 ml-2">
             {allowEdit && (
               <button
                 onClick={() => setShowEditor(true)}
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg transition-colors"
                 title="Edit drill parameters"
               >
-                <FiEdit2 size={18} />
+                <FiEdit2 size={15} />
               </button>
             )}
-            <div className="bg-white/20 rounded-lg px-2.5 py-0.5 text-xs font-medium">
+            <div className="bg-white/20 rounded-lg px-2 py-0.5 text-xs font-medium whitespace-nowrap">
               {currentCard.duration}
             </div>
           </div>
         </div>
-        <p className="text-blue-100 text-xs line-clamp-1 mb-1.5">{currentCard.description}</p>
+        <p className="text-blue-100 text-xs line-clamp-1 mb-1">{currentCard.description}</p>
 
         {/* Focus Points - Vertical with checkmarks */}
         {currentCard.focus_points.length > 0 && (
-          <div className="space-y-0.5 mt-1.5">
+          <div className="space-y-0.5 mt-1">
             {currentCard.focus_points.map((point, index) => (
               <div key={index} className="flex items-start gap-1.5">
                 <svg
@@ -96,10 +96,10 @@ export default function DrillCardComponent({
       </div>
 
       {/* PongBot Settings */}
-      <div className="p-4">
-        <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
+      <div className="p-2.5 sm:p-4">
+        <h3 className="text-xs sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3 flex items-center">
           <svg
-            className="w-5 h-5 mr-2 text-blue-600"
+            className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2 text-blue-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ export default function DrillCardComponent({
 
         {/* Court Diagram - Visual representation */}
         {hasNewFormat && (
-          <div className="mb-3 bg-gray-50 rounded-lg p-2">
+          <div className="mb-2 sm:mb-3 bg-gray-50 rounded-lg p-1.5 sm:p-2">
             <CourtDiagram
               machinePosition={currentCard.machine_position}
               ballSequence={currentCard.ball_sequence}
@@ -288,14 +288,14 @@ export default function DrillCardComponent({
 
 
       {/* Navigation Buttons */}
-      <div className="px-6 pb-6 flex gap-3">
+      <div className="px-3 pb-3 sm:px-6 sm:pb-6 flex gap-2 sm:gap-3">
         {onPrevious && currentDrill && currentDrill > 1 && (
           <button
             onClick={onPrevious}
-            className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors flex items-center justify-center"
+            className="flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center justify-center"
           >
             <svg
-              className="w-5 h-5 mr-2"
+              className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -307,13 +307,13 @@ export default function DrillCardComponent({
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Previous Drill
+            <span className="hidden xs:inline">Previous </span>Drill
           </button>
         )}
         {onUseSetting && (
           <button
             onClick={onUseSetting}
-            className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+            className="flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center justify-center"
           >
             Use new setting
           </button>
@@ -321,13 +321,13 @@ export default function DrillCardComponent({
         {onNext && (
           <button
             onClick={onNext}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+            className="flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center justify-center"
           >
             {currentDrill && totalDrills && currentDrill < totalDrills ? (
               <>
-                Next Drill
+                <span className="hidden xs:inline">Next </span>Drill
                 <svg
-                  className="w-5 h-5 ml-2"
+                  className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

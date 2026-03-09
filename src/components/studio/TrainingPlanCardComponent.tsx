@@ -123,12 +123,12 @@ export default function TrainingPlanCardComponent({
             disabled={saveStatus === 'saving'}
             className={`${
               onStartTraining ? 'flex-1' : 'w-full'
-            } px-6 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg transition-colors flex items-center justify-center text-lg shadow-lg hover:shadow-xl disabled:cursor-not-allowed`}
+            } px-3 py-2 sm:px-6 sm:py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg transition-colors flex items-center justify-center text-sm sm:text-lg shadow-lg hover:shadow-xl disabled:cursor-not-allowed`}
           >
             {saveStatus === 'saving' ? (
               <>
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin -ml-1 mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -152,7 +152,7 @@ export default function TrainingPlanCardComponent({
             ) : (
               <>
                 <svg
-                  className="w-6 h-6 mr-2"
+                  className="w-4 h-4 sm:w-6 sm:h-6 mr-1.5 sm:mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -173,10 +173,10 @@ export default function TrainingPlanCardComponent({
           {onStartTraining && (
             <button
               onClick={onStartTraining}
-              className="flex-1 px-6 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center text-lg shadow-lg hover:shadow-xl"
+              className="flex-1 px-3 py-2 sm:px-6 sm:py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center text-sm sm:text-lg shadow-lg hover:shadow-xl"
             >
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-4 h-4 sm:w-6 sm:h-6 mr-1.5 sm:mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
