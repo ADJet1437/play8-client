@@ -19,7 +19,7 @@ export function Navbar() {
   };
   
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md py-2 px-6 overflow-visible transition-colors">
+    <nav className="sticky top-0 bg-white dark:bg-gray-800 shadow-md py-2 px-6 overflow-visible transition-colors z-50">
       <div className="container mx-auto flex justify-between items-center overflow-visible">
         <Link to="/" className="flex items-center overflow-visible py-2">
           <Logo />

@@ -32,9 +32,6 @@ export function Testimonials() {
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('testimonials.title')}</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            {t('testimonials.subtitle')}
-          </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

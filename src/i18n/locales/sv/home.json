@@ -6,36 +6,84 @@
     "bookMachine": "Boka en maskin",
     "learnMore": "Läs mer"
   },
+  "aiCoach": {
+    "heading": "Din AI-drivna träningsplats",
+    "subtitle": "Få träningsplan. Boka en bollmaskin. Förbättra varje session.",
+    "placeholder": "Fråga mig vad som helst om tennis, padel m.m. ...",
+    "startFromHere": "Börja här",
+    "prompts": [
+      "Hur kan jag förbättra min tennisserve?",
+      "Vilka övningar ska jag göra för bättre fotarbete?",
+      "Tips för att slå en topspin forehand",
+      "Hur tränar man ensam med en bollmaskin?"
+    ]
+  },
+  "booking": {
+    "heading": "AI-coaching möter bollmaskinbokning",
+    "subtitle": "Allt du behöver för att bli bättre, på ett ställe."
+  },
+  "howItWorks": {
+    "title": "Hur fungerar det",
+    "steps": [
+      {
+        "title": "Berätta för AI-coachen om dig själv",
+        "description": "Dela din erfarenhet, nivå och mål. Berätta vad du vill uppnå — det tar mindre än en minut."
+      },
+      {
+        "title": "Få din träningsplan",
+        "description": "Play8 bygger en strukturerad session med anpassade drillkort med exakta maskinparametrar."
+      },
+      {
+        "title": "Boka en bollmaskin",
+        "description": "Välj en bana och boka en bollmaskin. Träna och anpassa dina planer på språng."
+      },
+      {
+        "title": "Träna med syfte",
+        "description": "Ta anteckningar, få insikter och råd under eller efter dina träningspass."
+      }
+    ],
+    "talkToCoach": "Prata med AI-coach",
+    "bookMachine": "Boka en maskin"
+  },
   "features": {
     "title": "Varför välja Play8?",
-    "subtitle": "Våra tennisbollsmaskiner ger den perfekta träningspartnern, tillgänglig när du vill.",
-    "flexibleScheduling": {
-      "title": "Flexibel schemaläggning",
-      "description": "Boka din träningspass när det passar dig. Börja när du vill och avsluta när du är klar."
-    },
-    "precisionTraining": {
-      "title": "Precisionsträning",
-      "description": "Våra maskiner levererar konsekvent bollplacering för att hjälpa dig fokusera på specifika delar av ditt spel."
-    },
-    "customizableSettings": {
-      "title": "Anpassningsbara inställningar",
-      "description": "Justera hastighet, rotation och bana för att matcha din skicklighetsnivå och träningsmål."
-    },
-    "trackProgress": {
-      "title": "Spåra din utveckling",
-      "description": "Granska din bokningshistorik för att se hur ofta du tränar och planera din förbättring."
-    }
+    "subtitle": "Inte bara en bollmaskin. Ett system som gör dig bättre.",
+    "cards": [
+      {
+        "title": "AI-designade sessioner",
+        "description": "Varje drill har ett syfte. AI-coachen delar upp din träning i fokuserade kort med specifika mål — inte slumpmässiga bollar."
+      },
+      {
+        "title": "Maskininställningar, klara för dig",
+        "description": "Sluta gissa hastighet, rotation eller frekvens. Varje drillkort inkluderar rekommenderade maskinparametrar."
+      },
+      {
+        "title": "Byggd för alla nivåer",
+        "description": "Oavsett om du började spela förra månaden eller tränar inför tävling, anpassar AI sig till var du är — och driver dig framåt."
+      },
+      {
+        "title": "Ingen partner, inget problem",
+        "description": "Kom ensam och träna som om du har en träningspartner. Bollmaskinen följer din plan — du fokuserar bara på ditt spel."
+      }
+    ],
+    "talkToCoach": "Prata med AI-coach",
+    "bookMachine": "Boka en maskin"
   },
   "testimonials": {
     "title": "Vad våra spelare säger",
     "subtitle": "Ta inte bara vårt ord för det. Här är vad tennisentusiaster tycker om Play8."
   },
   "cta": {
-    "title": "Redo att förbättra ditt tennisspel?",
-    "subtitle": "Boka en tennisbollsmaskin nu och ta dina färdigheter till nästa nivå. Våra maskiner finns tillgängliga på bekväma platser och tider.",
-    "button": "Boka en maskin nu"
+    "session": {
+      "title": "Starta din nästa session direkt här.",
+      "description": "Låt AI-coachen planera din träning. Boka en bollmaskin. Kom ut på banan.",
+      "talkToCoach": "Prata med AI-coach",
+      "bookMachine": "Boka en maskin"
+    },
+    "store": {
+      "title": "Vill du ha en egen maskin?",
+      "description": "Utforska PongBot Pace S Pro och Nova S Pro.",
+      "visitStore": "Besök butiken"
+    }
   }
 }
-
-
-

@@ -1,241 +1,112 @@
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useRef, useState, useCallback } from 'react';
-import {
-  FiTarget,
-  FiBarChart2,
-  FiRotateCw,
-  FiZap,
-  FiSmartphone,
-  FiList,
-  FiVideo,
-  FiCrosshair,
-} from 'react-icons/fi';
+import { FiMessageCircle, FiClipboard, FiCalendar, FiZap } from 'react-icons/fi';
 
-interface CardConfig {
-  key: string;
-  icon: React.ReactNode;
-  gradient: string;
-  // Desktop absolute position (% based)
-  x: number;
-  y: number;
-  rotation: number;
-  width: number;
-  height: number;
-  parallaxSpeed: number;
-}
-
-const CARDS: CardConfig[] = [
+const STEP_STYLES = [
   {
-    key: 'practiceModes',
-    icon: <FiTarget size={28} />,
-    gradient: 'linear-gradient(135deg, #f97316, #ec4899)',
-    x: 8, y: 2,
-    rotation: -6, width: 180, height: 110,
-    parallaxSpeed: 0.4,
+    bgIcon: <FiMessageCircle size={120} />,
+    gradient: 'linear-gradient(135deg, #ede9fe 0%, #ddd6fe 50%, #c4b5fd 100%)',
+    iconColor: 'text-violet-500',
+    titleColor: 'text-violet-900',
+    descColor: 'text-violet-700',
   },
   {
-    key: 'sessionAnalytics',
-    icon: <FiBarChart2 size={28} />,
-    gradient: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-    x: 62, y: 0,
-    rotation: 4, width: 200, height: 110,
-    parallaxSpeed: 0.6,
+    bgIcon: <FiClipboard size={120} />,
+    gradient: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #93c5fd 100%)',
+    iconColor: 'text-sky-500',
+    titleColor: 'text-sky-900',
+    descColor: 'text-sky-700',
   },
   {
-    key: 'spinSettings',
-    icon: <FiRotateCw size={28} />,
-    gradient: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
-    x: 0, y: 28,
-    rotation: -4, width: 170, height: 105,
-    parallaxSpeed: 0.3,
+    bgIcon: <FiCalendar size={120} />,
+    gradient: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%)',
+    iconColor: 'text-emerald-500',
+    titleColor: 'text-emerald-900',
+    descColor: 'text-emerald-700',
   },
   {
-    key: 'speedControl',
-    icon: <FiZap size={28} />,
-    gradient: 'linear-gradient(135deg, #06b6d4, #14b8a6)',
-    x: 78, y: 15,
-    rotation: 7, width: 165, height: 100,
-    parallaxSpeed: 0.5,
-  },
-  {
-    key: 'appControl',
-    icon: <FiSmartphone size={28} />,
-    gradient: 'linear-gradient(135deg, #10b981, #34d399)',
-    x: 2, y: 58,
-    rotation: 5, width: 170, height: 105,
-    parallaxSpeed: 0.35,
-  },
-  {
-    key: 'customDrills',
-    icon: <FiList size={28} />,
-    gradient: 'linear-gradient(135deg, #f43f5e, #e11d48)',
-    x: 75, y: 50,
-    rotation: -5, width: 185, height: 110,
-    parallaxSpeed: 0.55,
-  },
-  {
-    key: 'videoReplay',
-    icon: <FiVideo size={28} />,
-    gradient: 'linear-gradient(135deg, #0ea5e9, #38bdf8)',
-    x: 12, y: 76,
-    rotation: 3, width: 180, height: 105,
-    parallaxSpeed: 0.45,
-  },
-  {
-    key: 'smartTracking',
-    icon: <FiCrosshair size={28} />,
-    gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-    x: 65, y: 74,
-    rotation: -3, width: 185, height: 105,
-    parallaxSpeed: 0.5,
+    bgIcon: <FiZap size={120} />,
+    gradient: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 50%, #fdba74 100%)',
+    iconColor: 'text-orange-500',
+    titleColor: 'text-orange-900',
+    descColor: 'text-orange-700',
   },
 ];
 
 export function BallMachineFeature() {
-  const { t } = useTranslation('tutorial');
-  const sectionRef = useRef<HTMLElement>(null);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  const [scrollOffset, setScrollOffset] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
+  const { t } = useTranslation('home');
 
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (isMobile) return;
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    setMouseOffset({
-      x: (e.clientX - cx) / rect.width,
-      y: (e.clientY - cy) / rect.height,
-    });
-  }, [isMobile]);
-
-  const handleMouseLeave = useCallback(() => {
-    setMouseOffset({ x: 0, y: 0 });
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const progress = -rect.top / window.innerHeight;
-      setScrollOffset(progress);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const steps = t('howItWorks.steps', { returnObjects: true }) as { title: string; description: string }[];
 
   return (
-    <section
-      ref={sectionRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="relative py-16 overflow-hidden bg-gradient-to-b from-amber-50/40 to-white dark:from-gray-900 dark:to-gray-800"
-    >
-      {/* Desktop: orbital layout */}
-      {!isMobile && (
-        <div className="relative mx-auto max-w-6xl" style={{ height: 520 }}>
-          {/* Cards */}
-          {CARDS.map((card) => {
-            const tx = mouseOffset.x * 30 * card.parallaxSpeed;
-            const ty = mouseOffset.y * 30 * card.parallaxSpeed + scrollOffset * 40 * card.parallaxSpeed;
-            return (
-              <div
-                key={card.key}
-                className="absolute transition-transform duration-200 ease-out cursor-pointer group"
-                style={{
-                  left: `${card.x}%`,
-                  top: `${card.y}%`,
-                  width: card.width,
-                  height: card.height,
-                  transform: `translate(${tx}px, ${ty}px) rotate(${card.rotation}deg)`,
-                }}
-              >
+    <section className="relative py-20 transition-colors">
+      {/* Light mode background */}
+      <div
+        className="absolute inset-0 dark:hidden pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at center, #f5f7ff 0%, #eaedff 45%, #dce1fc 100%)' }}
+      />
+      {/* Dark mode background */}
+      <div
+        className="absolute inset-0 hidden dark:block pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at center, #1e1b4b 0%, #13113a 50%, #0a0920 100%)' }}
+      />
+      <div className="relative z-10 container mx-auto px-6 max-w-6xl">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">
+            {t('howItWorks.title')}
+          </h2>
+        </div>
+
+        {/* Cards */}
+        <div className="relative">
+          {/* Connector line (desktop only) */}
+          <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-violet-300 via-sky-300 via-emerald-300 to-orange-300 dark:from-violet-700 dark:via-sky-700 dark:via-emerald-700 dark:to-orange-700 z-0" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+            {steps.map((step, index) => {
+              const style = STEP_STYLES[index];
+              return (
                 <div
-                  className="w-full h-full rounded-2xl shadow-lg group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300 flex flex-col items-center justify-center gap-3 text-white"
-                  style={{ background: card.gradient }}
+                  key={index}
+                  className="relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 flex flex-col group hover:-translate-y-1"
+                  style={{ background: style.gradient }}
                 >
-                  {card.icon}
-                  <span className="text-sm font-semibold tracking-wide">
-                    {t(`cards.${card.key}`)}
-                  </span>
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center ${style.iconColor} opacity-10 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none`}
+                  >
+                    {style.bgIcon}
+                  </div>
+                  <h3 className={`text-base font-bold ${style.titleColor} mb-2 leading-snug relative z-10`}>
+                    {step.title}
+                  </h3>
+                  <p className={`text-sm ${style.descColor} leading-relaxed flex-1 relative z-10`}>
+                    {step.description}
+                  </p>
                 </div>
-              </div>
-            );
-          })}
-
-          {/* Center CTA */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center pointer-events-auto max-w-lg px-6">
-              <p className="text-xs font-bold tracking-[0.25em] uppercase text-gray-500 dark:text-gray-400 mb-4">
-                {t('label')}
-              </p>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                {t('title')}
-              </h2>
-              <h2 className="text-4xl md:text-5xl font-bold italic text-indigo-600 dark:text-indigo-400 mb-6">
-                {t('titleHighlight')}
-              </h2>
-              <p className="text-base text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                {t('subtitle')}
-              </p>
-              <a href="/#booking">
-                <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-semibold transition-colors shadow-lg hover:shadow-xl">
-                  {t('book')} →
-                </button>
-              </a>
-            </div>
+              );
+            })}
           </div>
         </div>
-      )}
 
-      {/* Mobile: grid layout */}
-      {isMobile && (
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-xs font-bold tracking-[0.25em] uppercase text-gray-500 dark:text-gray-400 mb-4">
-              {t('label')}
-            </p>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              {t('title')}
-            </h2>
-            <h2 className="text-3xl font-bold italic text-indigo-600 dark:text-indigo-400 mb-4">
-              {t('titleHighlight')}
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              {t('subtitle')}
-            </p>
-            <a href="/#booking">
-              <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-full font-semibold transition-colors shadow-lg">
-                {t('book')} →
-              </button>
-            </a>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {CARDS.map((card) => (
-              <div
-                key={card.key}
-                className="rounded-2xl shadow-md flex flex-col items-center justify-center gap-2 text-white py-8 px-4"
-                style={{ background: card.gradient }}
-              >
-                {card.icon}
-                <span className="text-xs font-semibold tracking-wide text-center">
-                  {t(`cards.${card.key}`)}
-                </span>
-              </div>
-            ))}
-          </div>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
+          <button
+            onClick={() => navigate('/agent')}
+            className="w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+          >
+            <FiMessageCircle size={18} />
+            {t('howItWorks.talkToCoach')}
+          </button>
+          <a href="/#booking" className="w-full sm:w-auto">
+            <button className="w-full px-8 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-semibold rounded-full shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-700 transition-all flex items-center justify-center gap-2">
+              <FiCalendar size={18} />
+              {t('howItWorks.bookMachine')}
+            </button>
+          </a>
         </div>
-      )}
+      </div>
     </section>
   );
 }
