@@ -6,36 +6,84 @@
     "bookMachine": "Book a Machine",
     "learnMore": "Learn More"
   },
+  "aiCoach": {
+    "heading": "Your AI-powered practice court",
+    "subtitle": "Get training plan. Book a ball machine. Improve every session.",
+    "placeholder": "Ask me anything about tennis, padel etc ...",
+    "startFromHere": "Start from here",
+    "prompts": [
+      "How can I improve my tennis serve?",
+      "What drills should I do for better footwork?",
+      "Tips for hitting a topspin forehand",
+      "How to practice alone with a ball machine?"
+    ]
+  },
+  "booking": {
+    "heading": "AI coaching meets ball machine booking",
+    "subtitle": "Everything you need to level up, in one place."
+  },
+  "howItWorks": {
+    "title": "How does it work",
+    "steps": [
+      {
+        "title": "Tell the AI coach about yourself",
+        "description": "Share your experience, level, and goals. Tell us what you want to accomplish — it takes less than a minute."
+      },
+      {
+        "title": "Get your training plan",
+        "description": "Play8 builds a structured session into customized drill cards with precise machine parameters."
+      },
+      {
+        "title": "Book a ball machine",
+        "description": "Pick a court and book a ball machine. Train and adapt your plans on the fly."
+      },
+      {
+        "title": "Train with purpose",
+        "description": "Take notes, get insights and advice during or after your training sessions."
+      }
+    ],
+    "talkToCoach": "Talk to AI coach",
+    "bookMachine": "Book a machine"
+  },
   "features": {
     "title": "Why Choose Play8?",
-    "subtitle": "Our tennis ball machines provide the perfect practice partner, available whenever you are.",
-    "flexibleScheduling": {
-      "title": "Flexible Scheduling",
-      "description": "Book your practice session at a time that works for you. Start when you want and end when you're done."
-    },
-    "precisionTraining": {
-      "title": "Precision Training",
-      "description": "Our machines deliver consistent ball placement to help you focus on specific areas of your game."
-    },
-    "customizableSettings": {
-      "title": "Customizable Settings",
-      "description": "Adjust speed, spin, and trajectory to match your skill level and training goals."
-    },
-    "trackProgress": {
-      "title": "Track Your Progress",
-      "description": "Review your booking history to see how often you practice and plan your improvement."
-    }
+    "subtitle": "Not just a ball machine. A system that makes you better.",
+    "cards": [
+      {
+        "title": "AI–designed sessions",
+        "description": "Every drill has a reason. The AI Coach breaks your practice into focused cards with specific goals — not random balls flying at you."
+      },
+      {
+        "title": "Ball machine settings, done for you",
+        "description": "No more guessing speed, spin, or frequency. Each drill card includes recommended machine parameters matched to the exercise."
+      },
+      {
+        "title": "Built for every level",
+        "description": "Whether you picked up a racket last month or you're training for competition, the AI adjusts to where you are — and pushes you forward."
+      },
+      {
+        "title": "No partner, no problem",
+        "description": "Walk in solo and train like you have a hitting partner. The ball machine follows your plan — you just focus on your game."
+      }
+    ],
+    "talkToCoach": "Talk to AI coach",
+    "bookMachine": "Book a machine"
   },
   "testimonials": {
     "title": "What Our Players Say",
     "subtitle": "Don't just take our word for it. Here's what tennis enthusiasts think about Play8."
   },
   "cta": {
-    "title": "Ready to Improve Your Tennis Game?",
-    "subtitle": "Book a tennis ball machine now and take your skills to the next level. Our machines are available at convenient locations and times.",
-    "button": "Book a Machine Now"
+    "session": {
+      "title": "Start your next session right here.",
+      "description": "Let the AI Coach plan your training. Book a ball machine. Get on court.",
+      "talkToCoach": "Talk to AI Coach",
+      "bookMachine": "Book a machine"
+    },
+    "store": {
+      "title": "Want your own machine?",
+      "description": "Explore the PongBot Pace S Pro and Nova S Pro.",
+      "visitStore": "Visit Store"
+    }
   }
 }
-
-
-
