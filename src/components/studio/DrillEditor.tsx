@@ -94,34 +94,31 @@ export function DrillEditor({ drill, onSave, onClose, onDone }: DrillEditorProps
               onUpdate={handleDrillUpdate}
             />
 
-            {/* Machine Position Display */}
-            <div className="mt-4 md:mt-6 p-3 md:p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <h4 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
-                Machine Position
-              </h4>
-              <p className="text-xs md:text-sm text-gray-900 dark:text-gray-100 font-medium">
-                {editedDrill.machine_position}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Click the "M" icon on the court to change
-              </p>
-            </div>
-
-            {/* Drill Info */}
-            <div className="mt-3 md:mt-4 p-3 md:p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <h4 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 md:mb-2">
-                Drill Info
-              </h4>
-              <div className="space-y-1 md:space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Duration:</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">{editedDrill.duration}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Sequence Repeats:</span>
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">{editedDrill.sequence_repetitions}x</span>
-                </div>
+            {/* Machine Position — one liner */}
+            {editedDrill.machine_position && (
+              <div className="mt-4 md:mt-6 flex items-center justify-between px-3 md:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <span className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300">Machine Position</span>
+                <span className="text-xs md:text-sm text-gray-900 dark:text-gray-100 font-medium">{editedDrill.machine_position}</span>
               </div>
+            )}
+
+            {/* Notes */}
+            <div className="mt-3 md:mt-4">
+              <h4 className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Notes
+              </h4>
+              <textarea
+                value={editedDrill.notes ?? ''}
+                onChange={(e) => {
+                  const updated = { ...editedDrill, notes: e.target.value };
+                  setEditedDrill(updated);
+                  setHasChanges(true);
+                  onSave(updated);
+                }}
+                placeholder="Add notes about this drill — what worked, what to focus on..."
+                rows={5}
+                className="w-full text-xs md:text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:placeholder-gray-500"
+              />
             </div>
           </div>
         </div>

@@ -124,6 +124,7 @@ export interface DrillCard {
   sequence_repetitions?: number;
   parameters?: PongBotParameters; // Legacy format (for backward compatibility)
   focus_points: string[];
+  notes?: string;
   training_plan_id: string;
   content_block_id?: string;
   messageIndex?: number; // Which message generated this card
