@@ -76,53 +76,34 @@ export function DrillSequenceView({ drills, onClose, onDrillDone, trainingPlan, 
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-900 bg-opacity-95 flex items-center justify-center p-4 overflow-y-auto">
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="fixed top-4 right-4 text-white hover:text-gray-300 p-2 rounded-lg hover:bg-white/10 transition-colors z-20"
-        aria-label="Close training view"
-      >
-        <svg
-          className="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-
-      {/* Progress indicator */}
-      <div className="fixed top-4 left-4 right-4 flex justify-center z-10">
-        <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-2 flex items-center gap-2">
-          <svg
-            className="w-5 h-5 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+      {/* Top bar: progress + close */}
+      <div className="fixed top-4 left-4 right-4 flex items-center justify-center z-20">
+        {/* Progress pill — centered */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 flex items-center gap-2">
+          <svg className="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="text-white font-medium">
+          <span className="text-white text-sm font-medium whitespace-nowrap">
             Drill {currentIndex + 1} of {localDrills.length}
           </span>
-          <div className="ml-2 h-1.5 w-32 bg-white/20 rounded-full overflow-hidden">
+          <div className="ml-1 h-1.5 w-16 bg-white/20 rounded-full overflow-hidden shrink-0">
             <div
               className="h-full bg-green-400 transition-all duration-300"
               style={{ width: `${((currentIndex + 1) / localDrills.length) * 100}%` }}
             />
           </div>
         </div>
+
+        {/* Close button — absolute right */}
+        <button
+          onClick={onClose}
+          className="absolute right-0 text-white hover:text-gray-300 p-2 rounded-lg hover:bg-white/10 transition-colors"
+          aria-label="Close training view"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       {/* Drill card */}
