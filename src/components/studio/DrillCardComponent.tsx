@@ -24,7 +24,7 @@ export default function DrillCardComponent({
   totalDrills,
   onDrillUpdate,
   onDrillDone,
-  onUseSetting,
+  onUseSetting: _onUseSetting,
   allowEdit = false,
 }: DrillCardComponentProps) {
   const [showEditor, setShowEditor] = useState(false);
