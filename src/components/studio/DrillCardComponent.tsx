@@ -40,9 +40,9 @@ export default function DrillCardComponent({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto flex flex-col">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto h-[690px] flex flex-col">
       {/* Header - Compact with Focus Points */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-2.5 sm:p-4">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 shrink-0">
         <div className="flex justify-between items-start mb-0.5 sm:mb-1">
           <div className="flex-1">
             <div className="text-xs font-medium opacity-90 mb-0.5">
@@ -96,7 +96,7 @@ export default function DrillCardComponent({
       </div>
 
       {/* PongBot Settings */}
-      <div className="p-2.5 sm:p-4">
+      <div className="p-2.5 sm:p-4 flex-1 overflow-y-auto">
 
         {/* Court Diagram - Visual representation */}
         {hasNewFormat && (
@@ -261,61 +261,25 @@ export default function DrillCardComponent({
 
 
       {/* Navigation Buttons */}
-      <div className="px-3 pb-3 sm:px-6 sm:pb-6 flex gap-2 sm:gap-3">
+      <div className="px-4 py-2 flex gap-2 justify-end">
         {onPrevious && currentDrill && currentDrill > 1 && (
           <button
             onClick={onPrevious}
-            className="flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center justify-center"
+            className="w-9 h-9 bg-gray-400/30 hover:bg-gray-400/50 text-gray-600 rounded-lg transition-colors flex items-center justify-center"
           >
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span className="hidden xs:inline">Previous </span>Drill
-          </button>
-        )}
-        {onUseSetting && (
-          <button
-            onClick={onUseSetting}
-            className="flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center justify-center"
-          >
-            Use new setting
           </button>
         )}
         {onNext && (
           <button
             onClick={onNext}
-            className="flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-medium rounded-lg transition-colors flex items-center justify-center"
+            className="w-9 h-9 bg-gray-400/30 hover:bg-gray-400/50 text-gray-600 rounded-lg transition-colors flex items-center justify-center"
           >
-            {currentDrill && totalDrills && currentDrill < totalDrills ? (
-              <>
-                <span className="hidden xs:inline">Next </span>Drill
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </>
-            ) : (
-              'Complete Training'
-            )}
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         )}
       </div>
