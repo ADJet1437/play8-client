@@ -24,11 +24,11 @@
     "subtitle": "Choose a machine and time that works for you. Our booking system is simple and flexible."
   },
   "activeBookings": {
-    "title": "Your Active Bookings",
-    "noActiveBookings": "You don't have any active bookings.",
-    "started": "Started",
+    "title": "Your Upcoming Bookings",
+    "noActiveBookings": "You have no upcoming bookings.",
+    "started": "Starts",
     "status": "Status",
-    "active": "Active",
+    "active": "Confirmed",
     "endSession": "End Session"
   }
 }
