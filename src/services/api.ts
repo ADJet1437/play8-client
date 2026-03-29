@@ -6,9 +6,12 @@ import {
   DeleteResponse,
   Machine,
   PagedResponse,
+  PaymentIntentResponse,
   PlanItem,
   PlanItemCreate,
+  RefundResponse,
   SavedTrainingSession,
+  SlotsResponse,
   TrainingPlanCard,
   DrillCard
 } from '../types';
@@ -46,9 +49,9 @@ api.interceptors.response.use(
 
 // Booking API
 export const bookingApi = {
-  list: async (limit = 100, offset = 0): Promise<PagedResponse<Booking>> => {
+  list: async (limit = 100, offset = 0, status?: string): Promise<PagedResponse<Booking>> => {
     const response = await api.get<PagedResponse<Booking>>('/bookings', {
-      params: { limit, offset },
+      params: { limit, offset, ...(status ? { status } : {}) },
     });
     return response.data;
   },
@@ -100,6 +103,13 @@ export const machineApi = {
   
   delete: async (id: string): Promise<DeleteResponse> => {
     const response = await api.delete<DeleteResponse>(`/machines/${id}`);
+    return response.data;
+  },
+
+  getSlots: async (machineId: string, date: string): Promise<SlotsResponse> => {
+    const response = await api.get<SlotsResponse>(`/machines/${machineId}/slots`, {
+      params: { date },
+    });
     return response.data;
   },
 };
@@ -195,6 +205,28 @@ export const savedSessionApi = {
     const response = await api.patch<SavedTrainingSession>(`/saved-sessions/${id}`, {
       drill_cards_data: drillCards,
     });
+    return response.data;
+  },
+};
+
+// Payment API
+export const paymentApi = {
+  createIntent: async (data: {
+    machine_id: string;
+    start_time: string;
+    end_time: string;
+  }): Promise<PaymentIntentResponse> => {
+    const response = await api.post<PaymentIntentResponse>('/payments/create-intent', data);
+    return response.data;
+  },
+
+  refund: async (bookingId: string): Promise<RefundResponse> => {
+    const response = await api.post<RefundResponse>(`/payments/${bookingId}/refund`);
+    return response.data;
+  },
+
+  verify: async (paymentIntentId: string): Promise<Booking> => {
+    const response = await api.post<Booking>('/payments/verify', { payment_intent_id: paymentIntentId });
     return response.data;
   },
 };

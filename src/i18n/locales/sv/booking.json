@@ -24,11 +24,11 @@
     "subtitle": "Välj en maskin och tid som passar dig. Vårt bokningssystem är enkelt och flexibelt."
   },
   "activeBookings": {
-    "title": "Dina aktiva bokningar",
-    "noActiveBookings": "Du har inga aktiva bokningar.",
-    "started": "Startade",
+    "title": "Dina kommande bokningar",
+    "noActiveBookings": "Du har inga kommande bokningar.",
+    "started": "Startar",
     "status": "Status",
-    "active": "Aktiv",
+    "active": "Bekräftad",
     "endSession": "Avsluta session"
   }
 }

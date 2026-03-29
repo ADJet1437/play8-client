@@ -19,6 +19,30 @@ export interface Booking {
   start_time: string; // ISO date string
   end_time?: string; // ISO date string, optional as it can be set later
   status: string;
+  payment_status?: string | null; // unpaid, paid, refunded
+  amount_paid?: number | null;    // in öre
+}
+
+export interface Payment {
+  id: string;
+  booking_id: string;
+  stripe_payment_intent_id: string;
+  amount: number; // in öre
+  currency: string;
+  status: string;
+}
+
+export interface PaymentIntentResponse {
+  booking_id: string;
+  client_secret: string;
+  amount: number;       // in öre
+  amount_sek: number;   // display amount in SEK
+}
+
+export interface RefundResponse {
+  booking_id: string;
+  status: string;
+  message: string;
 }
 
 export interface Machine {
@@ -26,6 +50,17 @@ export interface Machine {
   name: string;
   location: string;
   status: string;
+}
+
+export interface SlotInfo {
+  hour: number;
+  status: 'available' | 'booked';
+}
+
+export interface SlotsResponse {
+  date: string;
+  machine_id: string;
+  slots: SlotInfo[];
 }
 
 // Conversation Types

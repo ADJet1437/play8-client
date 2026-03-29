@@ -8,29 +8,13 @@ import { Booking } from '../types';
 
 export function BookingSection() {
   const { t } = useTranslation('booking');
-  const { bookings, loading, error, createBooking, updateBooking } = useBookings();
+  const { error, addBooking } = useBookings();
   const { machines } = useMachines();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleCreateBooking = async (booking: Omit<Booking, 'id' | 'user_id'>) => {
-    setIsSubmitting(true);
-    try {
-      await createBooking(booking as Omit<Booking, 'id'>);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  
-  const handleEndBooking = async (id: string) => {
-    setIsSubmitting(true);
-    try {
-      await updateBooking(id, {
-        status: 'completed',
-        end_time: new Date().toISOString(),
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleBookingCreated = (booking: Booking) => {
+    addBooking(booking);
+    setRefreshKey((k) => k + 1);
   };
   
   return (
@@ -53,17 +37,9 @@ export function BookingSection() {
         )}
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          <BookingForm 
-            onSubmit={handleCreateBooking} 
-            isLoading={isSubmitting || loading} 
-          />
-          
-          <BookingList 
-            bookings={bookings} 
-            machines={machines}
-            onEndBooking={handleEndBooking}
-            isLoading={isSubmitting}
-          />
+          <BookingForm onBookingCreated={handleBookingCreated} />
+
+          <BookingList machines={machines} refreshKey={refreshKey} />
         </div>
       </div>
     </section>
