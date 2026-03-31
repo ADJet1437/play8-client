@@ -1,33 +1,55 @@
 {
   "title": "Om Play8",
-  "intro": "På Play8 brinner vi för tennis och hjälper spelare på alla nivåer att förbättra sitt spel. Vårt namn representerar vårt engagemang för att erbjuda oändliga möjligheter för din tennisträning.",
-  "founded": "Grundad 2023 av en grupp tennisentusiaster, föddes Play8 från en enkel idé: göra högkvalitativa tennisbollsmaskiner tillgängliga för alla genom ett enkelt bokningssystem.",
-  "mission": {
-    "title": "Vårt uppdrag",
-    "content": "Vårt uppdrag är att hjälpa tennisspelare att träna effektivt enligt egen tidtabell. Vi tror att konsekvent träning är nyckeln till förbättring, och våra bollmaskiner ger den perfekta möjligheten för fokuserad, repetitiv träning."
-  },
-  "machines": {
-    "title": "Våra maskiner",
-    "description": "Vi erbjuder toppmoderna tennisbollsmaskiner på olika platser. Våra maskiner har:",
-    "features": {
-      "adjustableSpeed": "Justerbar hastighet och rotationsinställningar",
-      "programmablePatterns": "Programmerbara skottmönster",
-      "ballCapacity": "Bollkapacitet på 150+ bollar",
-      "batteryLife": "Batteritid på upp till 4-6 timmar",
-      "remoteControl": "Fjärrstyrning"
+  "tagline": "Vi bygger framtidens träningsplan.",
+  "intro1": "Play8 är ett svenskt sportteknologiföretag som gör träning utan partner smartare och mer tillgänglig — inom tennis, padel och bordtennis.",
+  "intro2": "Vi kombinerar AI-coachning med tillgång till professionella bollmaskiner i en och samma plattform. Spelare berättar för vår AI Coach vad de vill träna på, får ett strukturerat träningspass med maskininställningar för varje övning, och tränar med ett tydligt syfte — ingen partner behövs, ingen gissning.",
+  "whatWeDo": {
+    "title": "Vad vi gör",
+    "description": "Play8 verkar inom tre sammankopplade affärsområden:",
+    "closing": "De tre fungerar tillsammans: AI:n bygger planen, maskinen utför den och plattformen kopplar samman allt.",
+    "items": {
+      "aiCoach": {
+        "title": "AI Coach",
+        "content": "Vår AI bedömer en spelares nivå och mål, och genererar sedan ett strukturerat pass uppdelat i övningskort. Varje kort innehåller ett tydligt fokus, varaktighet och rekommenderade maskininställningar som spelaren kan följa på banan. Det är inte generiska råd — det är en färdig träningsplan."
+      },
+      "venueRentals": {
+        "title": "Anläggningsuthyrning",
+        "content": "Vi samarbetar med tennisklubbar, padelcentrum och bordtennishallar för att placera professionella bollmaskiner på plats. Spelare bokar en maskin via Play8-plattformen, dyker upp och tränar. I utvalda städer erbjuder vi även upphämtningsuthyrning — spelare hämtar en maskin från en hämtningspunkt och tar med den till valfri bana."
+      },
+      "equipmentSales": {
+        "title": "Utrustningsförsäljning",
+        "content": "Spelare, tränare och anläggningar som vill äga sin egen maskin kan köpa direkt via vår utrustningsbutik på store.play8.ai."
+      }
     }
   },
-  "howItWorks": {
-    "title": "Hur det fungerar",
-    "description": "Vårt bokningssystem är designat för att vara enkelt och flexibelt:",
-    "steps": {
-      "select": "Välj en maskin på din föredragna plats",
-      "book": "Boka din föredragna tidslucka",
-      "practice": "Träna och förbättra ditt spel",
-      "end": "Avsluta din session när du är klar"
+  "whyItMatters": {
+    "title": "Varför det spelar roll",
+    "content1": "De flesta racketsportspelare tränar utan en plan. De dyker upp, slår slumpmässiga bollar och lämnar utan att veta om de förbättrades. De som vill ha strukturerad träning har antingen inte råd med regelbunden coaching eller kan inte hitta en partner som passar deras schema.",
+    "content2": "Bollmaskiner löser halva det problemet — de dyker upp i tid och blir aldrig trötta. Men en maskin utan en plan är bara bollar som flyger mot dig. Och en plan utan maskin är bara ord på en skärm.",
+    "content3": "Play8 stänger det gapet. Vi ger varje spelare en personlig träningsplan och en maskin att träna med — på ett ställe, med ett klick."
+  },
+  "equipment": {
+    "title": "Vår utrustning",
+    "description": "Vi arbetar med två ändamålsbyggda maskiner från PongBot, var och en utformad för de specifika kraven i sin sport:",
+    "machines": {
+      "paceSPro": {
+        "title": "PongBot Pace S Pro",
+        "content": "Byggd för tennis och padel. Upp till 130 km/h bollhastighet, justerbar topspin och backspin, 564+ förinställda övningar och smarta träningsfunktioner inklusive Recovery Trigger, Adaptive Rally och Match Challenge. App-styrd med fullständiga OTA-uppdateringar. En professionell maskin för seriös träning på alla nivåer."
+      },
+      "novaSPro": {
+        "title": "PongBot Nova S Pro",
+        "content": "Byggd för bordtennis. En kompakt, ryggsäcksportabel maskin som väger bara 4 kg, med bollhastigheter upp till 15 m/s, 9 spintyper inklusive vänster/höger sidospinn-kombinationer, upp till 60 r/s spindhastighet, 264+ tränardesignade övningar och full visuell programmering via appen. Stöd för nära-nätet-placering och 44° oscillationsområde ger matchliknande variation i varje pass."
+      }
     }
+  },
+  "venues": {
+    "title": "Hur vi samarbetar med anläggningar",
+    "content1": "Play8 samarbetar med tennisklubbar, padelcentrum och bordtennishallar för att ge deras spelare AI-driven bollmaskinträning. Vi tillhandahåller utrustningen, teknologiplattformen och AI-coachninglagret. Partneranläggningar drar nytta av ökad beläggning, ny trafik från solotränar, och en andel av varje uthyrningsbokning — utan utrustningsinvestering.",
+    "content2": "Vi lanserar just nu våra första anläggningspartnerskap i Stockholmsregionen, med planer på att expandera över Sverige och Europa."
+  },
+  "company": {
+    "title": "Företaget",
+    "content1": "Play8 AB är registrerat i Sverige (org. nr. 559575-3863). Vi är ett team av racketsportspelare, produktdesigners och teknologer som tror att bättre verktyg leder till bättre träning — och bättre träning leder till bättre spelare.",
+    "content2": "play8.ai — AI-driven träning för tennis, padel och bordtennis. Tillgänglig på banor över hela Europa."
   }
 }
-
-
-
