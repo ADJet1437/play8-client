@@ -9,7 +9,7 @@ export function Footer() {
   return (
     <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-12 transition-colors">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('quickLinks')}</h3>
             <ul className="space-y-2">
@@ -25,6 +25,17 @@ export function Footer() {
             </ul>
           </div>
           
+          <div className="text-center md:text-left">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('companyInfo')}</h3>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-400">
+              <li>{t('companyName')}</li>
+              <li>{t('orgNumber')}</li>
+              <li>
+                <a href="mailto:support@play8.ai" className="hover:text-indigo-600 dark:hover:text-indigo-400">support@play8.ai</a>
+              </li>
+            </ul>
+          </div>
+
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{t('connectWithUs')}</h3>
             <div className="flex space-x-4 justify-center md:justify-start mb-4">

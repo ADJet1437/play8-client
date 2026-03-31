@@ -7,11 +7,13 @@ import { TermsPage } from './components/TermsPage';
 import { AgentPage } from './components/AgentPage';
 import { ProfilePage } from './components/ProfilePage';
 import { FloatingChatButton } from './components/FloatingChatButton';
+import { ScrollToTop } from './components/ScrollToTop';
 import './App.css';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />

@@ -1,30 +1,55 @@
 {
   "title": "About Play8",
-  "intro": "At Play8, we're passionate about tennis and helping players of all levels improve their game. Our name represents our commitment to providing infinite possibilities for your tennis practice.",
-  "founded": "Founded in 2023 by a group of tennis enthusiasts, Play8 was born from a simple idea: make high-quality tennis ball machines accessible to everyone through an easy booking system.",
-  "mission": {
-    "title": "Our Mission",
-    "content": "Our mission is to help tennis players practice effectively on their own schedule. We believe that consistent practice is the key to improvement, and our ball machines provide the perfect opportunity for focused, repetitive training."
-  },
-  "machines": {
-    "title": "Our Machines",
-    "description": "We offer state-of-the-art tennis ball machines at various locations. Our machines feature:",
-    "features": {
-      "adjustableSpeed": "Adjustable speed and spin settings",
-      "programmablePatterns": "Programmable shot patterns",
-      "ballCapacity": "Ball capacity of 150+ balls",
-      "batteryLife": "Battery life of up to 4-6 hours",
-      "remoteControl": "Remote control operation"
+  "tagline": "We're building the practice court of the future.",
+  "intro1": "Play8 is a Swedish sports technology company making solo training smarter and more accessible — across tennis, padel, and table tennis.",
+  "intro2": "We combine AI coaching with professional ball machine access into a single platform. Players tell our AI Coach what they want to work on, receive a structured training session with machine settings for each drill, and train with purpose — no partner needed, no guesswork.",
+  "whatWeDo": {
+    "title": "What we do",
+    "description": "Play8 operates across three connected business lines:",
+    "closing": "The three work together: the AI builds the plan, the machine executes it, and the platform connects everything.",
+    "items": {
+      "aiCoach": {
+        "title": "AI Coach",
+        "content": "Our AI assesses a player's level and goals, then generates a structured session broken into drill cards. Each card includes a clear focus, duration, and recommended ball machine settings the player can follow on court. It's not generic advice — it's a ready-to-execute training plan."
+      },
+      "venueRentals": {
+        "title": "Venue rentals",
+        "content": "We partner with tennis clubs, padel centers, and table tennis halls to place professional-grade ball machines on site. Players book a machine through the Play8 platform, show up, and train. In select cities, we also offer pickup rentals — players grab a machine from a collection point and bring it to any court they choose."
+      },
+      "equipmentSales": {
+        "title": "Equipment sales",
+        "content": "Players, coaches, and venues who want to own their own machine can purchase directly through our equipment store at store.play8.ai."
+      }
     }
   },
-  "howItWorks": {
-    "title": "How It Works",
-    "description": "Our booking system is designed to be simple and flexible:",
-    "steps": {
-      "select": "Select a machine at your preferred location",
-      "book": "Choose your start time",
-      "practice": "Practice as long as you need",
-      "end": "End your session when you're done"
+  "whyItMatters": {
+    "title": "Why this matters",
+    "content1": "Most racket sports players train without a plan. They show up, hit random balls, and leave without knowing if they improved. The ones who want structured practice either can't afford regular coaching or can't find a partner who matches their schedule.",
+    "content2": "Ball machines solve half of that problem — they show up on time and never get tired. But a machine without a plan is just balls flying at you. And a plan without a machine is just words on a screen.",
+    "content3": "Play8 closes that gap. We give every player a personal training plan and a machine to train with — in one place, at one click."
+  },
+  "equipment": {
+    "title": "Our equipment",
+    "description": "We work with two purpose-built machines from PongBot, each designed for the specific demands of its sport:",
+    "machines": {
+      "paceSPro": {
+        "title": "PongBot Pace S Pro",
+        "content": "Built for tennis and padel. Up to 130 km/h ball speed, adjustable topspin and backspin, 564+ preset drills, and smart training features including Recovery Trigger, Adaptive Rally, and Match Challenge. App-controlled with full OTA updates. A professional-grade machine for serious training at every level."
+      },
+      "novaSPro": {
+        "title": "PongBot Nova S Pro",
+        "content": "Built for table tennis. A compact, backpack-portable machine weighing just 4 kg, with ball speeds up to 15 m/s, 9 spin types including left/right side spin combinations, up to 60 r/s spin speed, 264+ coach-designed drills, and full visual programming through the app. Near-net placement support and 44° oscillation range bring match-like variety to every session."
+      }
     }
+  },
+  "venues": {
+    "title": "How we work with venues",
+    "content1": "Play8 partners with tennis clubs, padel centers, and table tennis halls to bring AI-powered ball machine training to their players. We provide the equipment, the technology platform, and the AI coaching layer. Partner venues benefit from increased utilization, new foot traffic from solo players, and a share of every rental booking — with zero equipment investment.",
+    "content2": "We're currently launching our first venue partnerships in the Stockholm region, with plans to expand across Sweden and Europe."
+  },
+  "company": {
+    "title": "The company",
+    "content1": "Play8 AB is registered in Sweden (org. nr. 559575-3863). We're a team of racket sports players, product designers, and technologists who believe that better tools lead to better practice — and better practice leads to better players.",
+    "content2": "play8.ai — AI-powered training for tennis, padel, and table tennis. Available at courts across Europe."
   }
 }
