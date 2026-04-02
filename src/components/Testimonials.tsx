@@ -1,63 +1,23 @@
-import { useTranslation } from 'react-i18next';
-import { FiStar } from 'react-icons/fi';
-
 export function Testimonials() {
-  const { t } = useTranslation('home');
-  const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      role: 'Amateur Tennis Player',
-      content: 'The Play8 ball machine has been a game-changer for my backhand. I can practice whenever I want without having to find a partner.',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80'
-    },
-    {
-      name: 'Michael Chen',
-      role: 'Tennis Coach',
-      content: 'I recommend Play8 to all my students for extra practice. The booking system is simple and the machines are always well-maintained.',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80'
-    },
-    {
-      name: 'Emma Rodriguez',
-      role: 'College Tennis Player',
-      content: 'The flexibility to end my session when I\'m done is perfect for my unpredictable schedule. Great service!',
-      rating: 4,
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80'
-    }
+  const videos = [
+    { id: 'jb9FaMyg6K8' },
+    { id: 'dI0gWNHZThc' },
   ];
-  
+
   return (
     <section className="py-16 bg-gray-50 dark:bg-gray-800 transition-colors">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{t('testimonials.title')}</h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 transition-colors">
-              <div className="flex items-center mb-4">
-                <img 
-                  src={testimonial.image} 
-                  alt={testimonial.name} 
-                  className="w-12 h-12 rounded-full object-cover mr-4"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {videos.map((video) => (
+            <div key={video.id} className="rounded-xl shadow-lg overflow-hidden bg-black">
+              <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${video.id}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={`Play8 video ${video.id}`}
                 />
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">{testimonial.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
-                </div>
-              </div>
-              
-              <p className="text-gray-700 dark:text-gray-300 mb-4">{testimonial.content}</p>
-              
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar 
-                    key={i}
-                    className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400 dark:text-yellow-500 fill-current' : 'text-gray-300 dark:text-gray-600'}`}
-                  />
-                ))}
               </div>
             </div>
           ))}
