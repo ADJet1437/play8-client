@@ -1,10 +1,11 @@
 {
   "title": "About Play8",
-  "tagline": "We're building the practice court of the future.",
-  "intro1": "Play8 is a Swedish sports technology company making solo training smarter and more accessible — across tennis, padel, and table tennis.",
-  "intro2": "We combine AI coaching with professional ball machine access into a single platform. Players tell our AI Coach what they want to work on, receive a structured training session with machine settings for each drill, and train with purpose — no partner needed, no guesswork.",
+  "missionLabel": "Our Mission",
+  "missionStatement": "We turn training intentions into court reality — AI that plans, machines that execute, players that improve.",
+  "intro1": "Play8 connects specialized AI capabilities with professional ball machines in one platform. Tell our AI what to work on — get a structured session with machine settings for every drill. No partner. No guesswork. Just progress.",
+  "intro2": "",
   "whatWeDo": {
-    "title": "What we do",
+    "title": "Our services",
     "description": "Play8 operates across three connected business lines:",
     "closing": "The three work together: the AI builds the plan, the machine executes it, and the platform connects everything.",
     "items": {

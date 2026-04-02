@@ -1,10 +1,11 @@
 {
   "title": "Om Play8",
-  "tagline": "Vi bygger framtidens träningsplan.",
-  "intro1": "Play8 är ett svenskt sportteknologiföretag som gör träning utan partner smartare och mer tillgänglig — inom tennis, padel och bordtennis.",
-  "intro2": "Vi kombinerar AI-coachning med tillgång till professionella bollmaskiner i en och samma plattform. Spelare berättar för vår AI Coach vad de vill träna på, får ett strukturerat träningspass med maskininställningar för varje övning, och tränar med ett tydligt syfte — ingen partner behövs, ingen gissning.",
+  "missionLabel": "Vårt uppdrag",
+  "missionStatement": "Vi omvandlar träningsintentioner till verklighet på banan — AI som planerar, maskiner som utför, spelare som förbättras.",
+  "intro1": "Play8 kombinerar specialiserade AI-funktioner med professionella bollmaskiner i en och samma plattform. Berätta för vår AI vad du vill träna på — få ett strukturerat pass med maskininställningar för varje övning. Ingen partner. Ingen gissning. Bara framsteg.",
+  "intro2": "",
   "whatWeDo": {
-    "title": "Vad vi gör",
+    "title": "Våra tjänster",
     "description": "Play8 verkar inom tre sammankopplade affärsområden:",
     "closing": "De tre fungerar tillsammans: AI:n bygger planen, maskinen utför den och plattformen kopplar samman allt.",
     "items": {
