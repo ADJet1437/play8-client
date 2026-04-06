@@ -12,6 +12,8 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   login: (returnUrl?: string) => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -56,6 +58,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Login error:', error);
       throw error;
     }
+  };
+
+  const loginWithEmail = async (email: string, password: string) => {
+    await authApi.login(email, password);
+    await checkAuth();
+  };
+
+  const register = async (email: string, password: string, name?: string) => {
+    await authApi.register(email, password, name);
+    // Don't log in — user must verify email first
   };
 
   const logout = async () => {
@@ -122,6 +134,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAuthenticated: !!user,
         login,
+        loginWithEmail,
+        register,
         logout,
         checkAuth,
       }}
