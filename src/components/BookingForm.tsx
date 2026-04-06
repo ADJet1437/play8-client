@@ -1,19 +1,11 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import { Button } from './Button';
-import { useMachines } from '../hooks/useMachines';
 import { Booking, Machine } from '../types';
-import { useAuth } from '../contexts/AuthContext';
-import { LoginModal } from './LoginModal';
-import { paymentApi, waitingListApi } from '../services/api';
-import { PaymentForm } from './PaymentForm';
-import { SlotPicker } from './SlotPicker';
+import { waitingListApi } from '../services/api';
 import { cn } from '../lib/utils';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
 
 type BookingTab = 'book' | 'rent';
 type RentalPlan = 'week' | 'month';
@@ -110,32 +102,18 @@ interface BookingFormProps {
   onBookingCreated: (booking: Booking) => void;
 }
 
-type BookingStep = 'details' | 'payment' | 'success';
+
 
 const RENTAL_PLANS: { id: RentalPlan; weeks?: number; months?: number; price: number; label: string; sublabel: string }[] = [
   { id: 'week', label: '1 Week', sublabel: '499 kr', price: 499 },
   { id: 'month', label: '1 Month', sublabel: '1 999 kr', price: 1999 },
 ];
 
-export function BookingForm({ onBookingCreated }: BookingFormProps) {
+export function BookingForm({ onBookingCreated: _onBookingCreated }: BookingFormProps) {
   const { t } = useTranslation('booking');
-  const { machines, loading: loadingMachines } = useMachines();
-  const { isAuthenticated } = useAuth();
 
   // Tab
   const [activeTab, setActiveTab] = useState<BookingTab>('rent');
-
-  // Book a machine state
-  const [machineId, setMachineId] = useState('');
-  const [startISO, setStartISO] = useState<string | null>(null);
-  const [endISO, setEndISO] = useState<string | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingStep, setBookingStep] = useState<BookingStep>('details');
-  const [clientSecret, setClientSecret] = useState('');
-  const [bookingId, setBookingId] = useState('');
-  const [amountSek, setAmountSek] = useState(0);
 
   // Rental state
   const [selectedPlan, setSelectedPlan] = useState<RentalPlan | null>(null);
@@ -144,53 +122,6 @@ export function BookingForm({ onBookingCreated }: BookingFormProps) {
   const [rentalMessage, setRentalMessage] = useState('');
   const [rentalError, setRentalError] = useState('');
   const [rentalLoading, setRentalLoading] = useState(false);
-
-  // ── Book a machine handlers ──────────────────────────────────────────────
-
-  const handleDetailsSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-
-    if (!isAuthenticated) {
-      const currentUrl = window.location.pathname + window.location.hash;
-      sessionStorage.setItem('oauth_return_url', currentUrl);
-      setShowLoginModal(true);
-      return;
-    }
-    if (!machineId) { setFormError(t('pleaseSelectMachine')); return; }
-    if (!startISO || !endISO) { setFormError('Please select at least one time slot.'); return; }
-
-    setIsSubmitting(true);
-    try {
-      const result = await paymentApi.createIntent({ machine_id: machineId, start_time: startISO, end_time: endISO });
-      setClientSecret(result.client_secret);
-      setBookingId(result.booking_id);
-      setAmountSek(result.amount_sek);
-      setBookingStep('payment');
-    } catch (err: any) {
-      setFormError(err?.response?.data?.detail ?? 'Failed to initiate booking. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
-    try {
-      const confirmedBooking = await paymentApi.verify(paymentIntentId);
-      onBookingCreated(confirmedBooking);
-    } catch {
-      onBookingCreated({
-        id: bookingId, machine_id: machineId, start_time: startISO!, end_time: endISO!,
-        status: 'confirmed', payment_status: 'paid', amount_paid: Math.round(amountSek * 100),
-      });
-    }
-    setBookingStep('success');
-  };
-
-  const handleReset = () => {
-    setMachineId(''); setStartISO(null); setEndISO(null); setFormError(null);
-    setClientSecret(''); setBookingId(''); setAmountSek(0); setBookingStep('details');
-  };
 
   // ── Rental handlers ──────────────────────────────────────────────────────
 
@@ -218,27 +149,6 @@ export function BookingForm({ onBookingCreated }: BookingFormProps) {
       setRentalLoading(false);
     }
   };
-
-  // ── Booking success screen ───────────────────────────────────────────────
-
-  if (bookingStep === 'success') {
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors">
-        <div className="text-center py-4">
-          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 mx-auto mb-4">
-            <svg className="w-7 h-7 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Booking Confirmed!</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Your payment of {amountSek.toFixed(0)} SEK was successful. Your session is confirmed.
-          </p>
-          <Button variant="primary" onClick={handleReset}>Book Another Session</Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -382,30 +292,7 @@ export function BookingForm({ onBookingCreated }: BookingFormProps) {
           </div>
         )}
 
-        {/* ── Payment step (book tab) ── */}
-        {activeTab === 'book' && bookingStep === 'payment' && clientSecret && (
-          <div className="mt-6">
-            <Elements stripe={stripePromise}>
-              <PaymentForm
-                clientSecret={clientSecret}
-                amountSek={amountSek}
-                onSuccess={handlePaymentSuccess}
-                onCancel={handleReset}
-              />
-            </Elements>
-          </div>
-        )}
       </div>
-
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onLoginSuccess={() => {
-          setShowLoginModal(false);
-          const form = document.querySelector('form');
-          if (form) form.requestSubmit();
-        }}
-      />
     </>
   );
 }
