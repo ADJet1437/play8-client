@@ -236,6 +236,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  is_verified: boolean;
 }
 
 export interface Token {
@@ -249,19 +250,44 @@ export const authApi = {
     const response = await api.get<{ auth_url: string }>('/auth/google');
     return response.data;
   },
-  
+
   handleGoogleCallback: async (code: string): Promise<Token> => {
     const response = await api.post<Token>('/auth/google/callback', { code });
     return response.data;
   },
-  
+
   getCurrentUser: async (): Promise<{ user: User | null }> => {
     const response = await api.get<{ user: User | null }>('/auth/me');
     return response.data;
   },
-  
+
   logout: async (): Promise<{ message: string }> => {
     const response = await api.post<{ message: string }>('/auth/logout');
+    return response.data;
+  },
+
+  register: async (email: string, password: string, name?: string): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/auth/register', { email, password, name });
+    return response.data;
+  },
+
+  login: async (email: string, password: string): Promise<Token> => {
+    const response = await api.post<Token>('/auth/login', { email, password });
+    return response.data;
+  },
+
+  verifyEmail: async (token: string): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/auth/verify-email', { token });
+    return response.data;
+  },
+
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  resetPassword: async (token: string, new_password: string): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/auth/reset-password', { token, new_password });
     return response.data;
   },
 };

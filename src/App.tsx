@@ -6,6 +6,8 @@ import { PrivacyPage } from './components/PrivacyPage';
 import { TermsPage } from './components/TermsPage';
 import { AgentPage } from './components/AgentPage';
 import { ProfilePage } from './components/ProfilePage';
+import { VerifyEmailPage } from './components/VerifyEmailPage';
+import { ResetPasswordPage } from './components/ResetPasswordPage';
 import { FloatingChatButton } from './components/FloatingChatButton';
 import { ScrollToTop } from './components/ScrollToTop';
 import './App.css';
@@ -23,8 +25,10 @@ function App() {
           <Route path="/agent" element={<AgentPage />} />
           <Route path="/agent/:conversationId" element={<AgentPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          {/* OAuth callback route - AuthContext handles the callback logic */}
+          {/* Auth routes */}
           <Route path="/auth/google/callback" element={<HomePage />} />
+          <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
         </Routes>
         <FloatingChatButton />
       </Layout>
