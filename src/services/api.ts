@@ -231,6 +231,14 @@ export const paymentApi = {
   },
 };
 
+// Waiting List API
+export const waitingListApi = {
+  join: async (email: string, plan: 'week' | 'month', message?: string): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/waiting-list', { email, plan, message });
+    return response.data;
+  },
+};
+
 // Auth API
 export interface User {
   id: string;
